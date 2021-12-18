@@ -4,10 +4,10 @@
 * For more information see <https://github.com/bertabescos/DynaSLAM>.
 *
 */
-
+#include <iostream>
 
 #include "Conversion.h"
-#include <iostream>
+
 
 
 namespace DynaSLAM
@@ -115,7 +115,7 @@ public:
         for( i = 0; i < dims - (cn > 1); i++ )
             step[i] = (size_t)_strides[i];
 
-        datastart = data = (uchar*)PyArray_DATA(o);
+        datastart = data = (uchar*) PyArray_DATA(o);
 
     }
 
@@ -208,6 +208,7 @@ NDArrayConverter::NDArrayConverter() { init(); }
 
 void NDArrayConverter::init()
 {
+    //if(PyArray_API == NULL) { import_array(); } 
     import_array();
 }
 

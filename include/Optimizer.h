@@ -37,6 +37,8 @@ class LoopClosing;
 class Optimizer
 {
 public:
+    //============
+    //float mMovingProbability;
     void static BundleAdjustment(const std::vector<KeyFrame*> &vpKF, const std::vector<MapPoint*> &vpMP,
                                  int nIterations = 5, bool *pbStopFlag=NULL, const unsigned long nLoopKF=0,
                                  const bool bRobust = true);
@@ -44,6 +46,12 @@ public:
                                        const unsigned long nLoopKF=0, const bool bRobust = true);
     void static LocalBundleAdjustment(KeyFrame* pKF, bool *pbStopFlag, Map *pMap);
     int static PoseOptimization(Frame* pFrame);
+
+    //=======================
+    int static PoseOptimization(KeyFrame* pFrame, bool bUpdateMap);
+    // void static SemanticBundleAdjustment(KeyFrame* pKF, bool* pbStopFlag);
+    // void static SemanticBundleAdjustment(KeyFrame* pKF);
+    void static SemanticBundleAdjustment(KeyFrame* pKF, bool* pbStopFlag, Map* pMap, int& num_fixedKF);
 
     //Inserted by Berta
     //int PoseOptimization(Frame *pFrame,DynaSLAM::Geometry & geom);

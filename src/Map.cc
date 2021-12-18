@@ -24,9 +24,15 @@
 
 namespace ORB_SLAM2
 {
+long unsigned int Map::nNextId=0;
 
 Map::Map():mnMaxKFid(0),mnBigChangeIdx(0)
 {
+}
+
+Map::Map(int initKFid):mnInitKFid(initKFid), mnMaxKFid(initKFid)
+{
+    mnId=nNextId++;
 }
 
 void Map::AddKeyFrame(KeyFrame *pKF)
@@ -115,6 +121,66 @@ long unsigned int Map::GetMaxKFid()
     return mnMaxKFid;
 }
 
+Map* Map::GetCurrentMap()
+{
+    unique_lock<mutex> lock(mMutexMap);
+    if(!mpCurrentMap)
+        CreateNewMap();
+    while(mpCurrentMap->IsBad())
+        usleep(3000);
+
+    return mpCurrentMap;
+}
+void Map::CreateNewMap()
+{
+    unique_lock<mutex> lock(mMutexMap);
+    cout << "Creation of new map with id: " << Map::nNextId << endl;
+    if(mpCurrentMap){
+        cout << "Exits current map " << endl;
+        if(!mspMaps.empty() && mnLastInitKFidMap < mpCurrentMap->GetMaxKFid())
+            mnLastInitKFidMap = mpCurrentMap->GetMaxKFid()+1; //The init KF is the next of current maximum
+
+        mpCurrentMap->SetStoredMap();
+        cout << "Saved map with ID: " << mpCurrentMap->GetId() << endl;
+
+        //if(mHasViewer)
+        //    mpViewer->AddMapToCreateThumbnail(mpCurrentMap);
+    }
+    cout << "Creation of new map with last KF id: " << mnLastInitKFidMap << endl;
+
+    mpCurrentMap = new Map(mnLastInitKFidMap);
+    mpCurrentMap->SetCurrentMap();
+    mspMaps.insert(mpCurrentMap);
+}
+
+void Map::SetCurrentMap()
+{
+    mIsInUse = true;
+}
+
+void Map::SetStoredMap()
+{
+    mIsInUse = false;
+}
+
+long unsigned int Map::GetId()
+{
+    return mnId;
+}
+
+bool Map::IsBad()
+{
+    return mbBad;
+}
+
+long unsigned int Map::GetInitKFid()
+{
+    unique_lock<mutex> lock(mMutexMap);
+    return mnInitKFid;
+}
+
+
+
 void Map::clear()
 {
     for(set<MapPoint*>::iterator sit=mspMapPoints.begin(), send=mspMapPoints.end(); sit!=send; sit++)
@@ -128,6 +194,12 @@ void Map::clear()
     mnMaxKFid = 0;
     mvpReferenceMapPoints.clear();
     mvpKeyFrameOrigins.clear();
+}
+
+bool Map::IsInertial()
+{
+    unique_lock<mutex> lock(mMutexMap);
+    return mbIsInertial;
 }
 
 } //namespace ORB_SLAM

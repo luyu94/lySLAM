@@ -10,14 +10,15 @@
 
 #define CONVERSION_H_
 
-#include <Python.h>
+
+#include <python2.7/Python.h>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/core/core.hpp>
 #include "ndarrayobject.h"
-// #include "__multiarray_api.h"
+//#include "__multiarray_api.h"
 
-#define NUMPY_IMPORT_ARRAY_RETVAL
+#define import_array() NUMPY_IMPORT_ARRAY_RETVAL
 
 namespace DynaSLAM
 {

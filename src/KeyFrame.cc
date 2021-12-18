@@ -10,31 +10,96 @@
 #include "KeyFrame.h"
 #include "Converter.h"
 #include "ORBmatcher.h"
-#include<mutex>
+#include <mutex>
+#include "Semantic.h"
 
 namespace ORB_SLAM2
 {
 
 long unsigned int KeyFrame::nNextId=0;
 
-KeyFrame::KeyFrame(Frame &F, Map *pMap, KeyFrameDatabase *pKFDB):
-    mnFrameId(F.mnId),  mTimeStamp(F.mTimeStamp), mnGridCols(FRAME_GRID_COLS), mnGridRows(FRAME_GRID_ROWS),
-    mfGridElementWidthInv(F.mfGridElementWidthInv), mfGridElementHeightInv(F.mfGridElementHeightInv),
-    mnTrackReferenceForFrame(0), mnFuseTargetForKF(0), mnBALocalForKF(0), mnBAFixedForKF(0),
-    mnLoopQuery(0), mnLoopWords(0), mnRelocQuery(0), mnRelocWords(0), mnBAGlobalForKF(0),
-    fx(F.fx), fy(F.fy), cx(F.cx), cy(F.cy), invfx(F.invfx), invfy(F.invfy),
-    mbf(F.mbf), mb(F.mb), mThDepth(F.mThDepth), N(F.N), mvKeys(F.mvKeys), mvKeysUn(F.mvKeysUn),
-    mvuRight(F.mvuRight), mvDepth(F.mvDepth), mDescriptors(F.mDescriptors.clone()),
-    mBowVec(F.mBowVec), mFeatVec(F.mFeatVec), mnScaleLevels(F.mnScaleLevels), mfScaleFactor(F.mfScaleFactor),
-    mfLogScaleFactor(F.mfLogScaleFactor), mvScaleFactors(F.mvScaleFactors), mvLevelSigma2(F.mvLevelSigma2),
-    mvInvLevelSigma2(F.mvInvLevelSigma2), mnMinX(F.mnMinX), mnMinY(F.mnMinY), mnMaxX(F.mnMaxX),
-    mnMaxY(F.mnMaxY), mK(F.mK), mvpMapPoints(F.mvpMapPoints), mpKeyFrameDB(pKFDB),
-    mpORBvocabulary(F.mpORBvocabulary), mbFirstConnection(true), mpParent(NULL), mbNotErase(false),
-    mbToBeErased(false), mbBad(false), mHalfBaseline(F.mb/2), mpMap(pMap)
+KeyFrame::KeyFrame(Frame &F, Map *pMap, KeyFrameDatabase *pKFDB)
+    : mnFrameId(F.mnId)
+    , mTimeStamp(F.mTimeStamp)
+    , mnGridCols(FRAME_GRID_COLS)
+    , mnGridRows(FRAME_GRID_ROWS)
+    , mfGridElementWidthInv(F.mfGridElementWidthInv)
+    , mfGridElementHeightInv(F.mfGridElementHeightInv)
+    , mnTrackReferenceForFrame(0)
+    , mnFuseTargetForKF(0)
+    , mnBALocalForKF(0)
+    , mnBAFixedForKF(0)
+    , mnLoopQuery(0)
+    , mnLoopWords(0)
+    , mnRelocQuery(0)
+    , mnRelocWords(0)
+    , mnBAGlobalForKF(0)
+    , fx(F.fx)
+    , fy(F.fy)
+    , cx(F.cx)
+    , cy(F.cy)
+    , invfx(F.invfx)
+    , invfy(F.invfy)
+    , mbf(F.mbf)
+    , mb(F.mb)
+    , mThDepth(F.mThDepth)
+    , N(F.N)
+    , mvKeys(F.mvKeys)
+    , mvKeysUn(F.mvKeysUn)
+    , mvuRight(F.mvuRight)
+    , mvDepth(F.mvDepth)
+    , mDescriptors(F.mDescriptors.clone())
+    , mBowVec(F.mBowVec)
+    , mFeatVec(F.mFeatVec)
+    , mnScaleLevels(F.mnScaleLevels)
+    , mfScaleFactor(F.mfScaleFactor)
+    , mfLogScaleFactor(F.mfLogScaleFactor)
+    , mvScaleFactors(F.mvScaleFactors)
+    , mvLevelSigma2(F.mvLevelSigma2)
+    , mvInvLevelSigma2(F.mvInvLevelSigma2)
+    , mnMinX(F.mnMinX)
+    , mnMinY(F.mnMinY)
+    , mnMaxX(F.mnMaxX)
+    , mnMaxY(F.mnMaxY)
+    , mK(F.mK)
+    , mvpMapPoints(F.mvpMapPoints)
+    , mpKeyFrameDB(pKFDB)
+    , mpORBvocabulary(F.mpORBvocabulary)
+    , mbFirstConnection(true)
+    , mpParent(NULL)
+    , mbNotErase(false)
+    , mbToBeErased(false)
+    , mbBad(false)
+    , mHalfBaseline(F.mb/2)
+    , mpMap(pMap)
+    , mFrame(&F)
+    , mvbKptOutliers(F.mvbKptOutliers)  //
+    , mvbOutlier(F.mvbOutlier)         //
 {
-    mnId=nNextId++;
+    //==========Semantic==========save RGB image and semantc results
+    mImRGB = F.mImRGB.clone();
+    mImDepth = F.mImDepth.clone();
 
-    F.mIsKeyFrame = true;
+    mbSemanticReady = false;
+    mbIsInsemanticQueue = false;
+
+    mImLabel = cv::Mat::zeros(mImRGB.size(), CV_8UC1);
+    mImScore = cv::Mat::zeros(mImRGB.size(), CV_8UC1);
+    mImMask = cv::Mat::zeros(mImRGB.size(), CV_8UC1);
+    mImMaskOld = cv::Mat::zeros(mImRGB.size(), CV_8UC1);
+
+    mvpTemptMapPoints = vector<MapPoint*>(N, static_cast<MapPoint*>(NULL));
+
+    // mImLabel = F.mImLabel.clone();
+    // mImScore = F.mImScore.clone();
+
+    //imgLeft = F.imgLeft.clone();
+    //imgRight = F.imgRight.clone();
+
+
+    mnId = nNextId++;
+
+    F.mbIsKeyFrame = true;   //是关键帧
 
     mGrid.resize(mnGridCols);
     for(int i=0; i<mnGridCols;i++)
@@ -223,6 +288,7 @@ void KeyFrame::ReplaceMapPointMatch(const size_t &idx, MapPoint* pMP)
     mvpMapPoints[idx]=pMP;
 }
 
+// ==========================TODO: filter using semantic information
 set<MapPoint*> KeyFrame::GetMapPoints()
 {
     unique_lock<mutex> lock(mMutexFeatures);
@@ -233,17 +299,24 @@ set<MapPoint*> KeyFrame::GetMapPoints()
             continue;
         MapPoint* pMP = mvpMapPoints[i];
         if(!pMP->isBad())
+        {
+            if (pMP->IsDynamicMapPoint())
+            {
+                continue;
+            }
             s.insert(pMP);
+        }
     }
     return s;
 }
 
+//====================================
 int KeyFrame::TrackedMapPoints(const int &minObs)
 {
     unique_lock<mutex> lock(mMutexFeatures);
 
     int nPoints=0;
-    const bool bCheckObs = minObs>0;
+    const bool bCheckObs = minObs > 0;
     for(int i=0; i<N; i++)
     {
         MapPoint* pMP = mvpMapPoints[i];
@@ -251,6 +324,10 @@ int KeyFrame::TrackedMapPoints(const int &minObs)
         {
             if(!pMP->isBad())
             {
+                if (pMP->IsDynamicMapPoint()) 
+                {
+                    continue;
+                }
                 if(bCheckObs)
                 {
                     if(mvpMapPoints[i]->Observations()>=minObs)
@@ -652,5 +729,118 @@ float KeyFrame::ComputeSceneMedianDepth(const int q)
 
     return vDepths[(vDepths.size()-1)/q];
 }
+
+//===========================================================
+void KeyFrame::UpdatePrioriMovingProbability()
+{
+    if (!this->IsSemanticReady()) {
+        LOG(WARNING) << "No semantic mask: " << this->mnFrameId;
+        return;
+    }
+    cv::Mat showFeature = this->mImRGB.clone();
+
+    float p_zd_md = 0.9;
+    float p_zs_md = 0.1;
+    float p_zs_ms = 0.9;
+    float p_zd_ms = 0.1;
+
+    auto start = std::chrono::steady_clock::now();
+    // cv::Mat Rcw = this->GetPose().rowRange(0, 3).colRange(0, 3);
+    // cv::Mat tcw = this->GetPose().rowRange(0, 3).col(3);
+    // cv::Mat Ow = -Rcw.t() * tcw;
+    // Remove outliers of current keyframe
+    // unique_lock<mutex> lock(mMutexFeatures);
+    bool bIsMapPointExists = false;
+
+    // unique_lock<mutex> lock(this->GetMap()->mMutexMapUpdate);
+    for (int i = 0; i < this->N; i++) {
+        // mark dynamic features
+        cv::KeyPoint kp = this->mvKeys[i];
+        if (kp.pt.x <= 0 || kp.pt.x >= this->mImMask.cols)
+            continue;
+        if (kp.pt.y <= 0 || kp.pt.y >= this->mImMask.rows)
+            continue;
+
+        MapPoint* pMP = this->mvpMapPoints[i];
+        bIsMapPointExists = false;
+        if (pMP) {
+            if (!pMP->isBad())
+                bIsMapPointExists = true;
+        }
+
+        if (this->mImMask.at<uchar>((int)kp.pt.y, (int)kp.pt.x) == 255) {
+            this->mbIsHasDynamicObject = true;
+            // dynamic object exists
+            // visualization
+            cv::circle(showFeature, kp.pt, 2, cv::Scalar(0, 0, 255), -1);
+            this->mvbKptOutliers[i] = true;
+            this->mnDynamicPoints++;
+            // if (bIsMapPointExists) {
+            //     pMP->mnObservedDynamic++;
+            //     // update moving probability
+            //     // pMP->mMovingProbability = 1;
+            // }
+        } else {
+            // visualization
+            cv::circle(showFeature, kp.pt, 2, cv::Scalar(255, 0, 0), -1);
+            this->mvbKptOutliers[i] = false;
+            // if (bIsMapPointExists) {
+            //     // pMP->mMovingProbability = 0;
+            //     pMP->mnObservedStatic++;
+            // }
+        }
+        if (bIsMapPointExists) {
+            // update moving probability
+            float p_old_d = pMP->GetMovingProbability();
+            float p_old_s = 1 - p_old_d;
+
+            if (this->mvbKptOutliers[i]) {
+                float p_d = p_zd_md * p_old_d;
+                float p_s = p_zd_ms * p_old_s;
+                float eta = 1 / (p_d + p_s);
+                // pMP->mMovingProbability = eta * p_d;
+                pMP->SetMovingProbability(eta * p_d);
+            } else {
+                float p_d = p_zs_md * p_old_d;
+                float p_s = p_zs_ms * p_old_s;
+                float eta = 1 / (p_d + p_s);
+                // pMP->mMovingProbability = eta * p_d;
+                pMP->SetMovingProbability(eta * p_d);
+            }
+        }
+
+    } //end for
+
+    // this->GetMap()->IncreaseChangeIndex();
+    // lock.unlock();
+
+    auto end = std::chrono::steady_clock::now();
+    std::chrono::duration<double> diff = end - start;
+    // LOG(INFO) << "Time to update moving probability:  " << std::setw(3) << diff.count() * 1000 << " ms";
+    Semantic::GetInstance()->mvTimeUpdateMovingProbability.emplace_back(diff.count());
+
+    Config::GetInstance()->saveImage(showFeature, "feature", "semantic_" + std::to_string(this->mnId) + ".png");
+}
+
+
+void KeyFrame::InformSemanticReady(const bool bSemanticReady)
+{
+    std::unique_lock<mutex> lock(mMutexSemantic);
+    mbSemanticReady = bSemanticReady;
+}
+
+bool KeyFrame::IsSemanticReady()
+{
+    std::unique_lock<mutex> lock(mMutexSemantic);
+    return mbSemanticReady;
+}
+
+Map* KeyFrame::GetMap()
+{
+    unique_lock<mutex> lock(mMutexMap);
+    return mpMap;
+}
+
+
 
 } //namespace ORB_SLAM

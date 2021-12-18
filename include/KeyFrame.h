@@ -105,9 +105,40 @@ public:
         return pKF1->mnId<pKF2->mnId;
     }
 
+    //========
+    Map* GetMap();
+
 
     // The following variables are accesed from only 1 thread or never change (no mutex needed).
 public:
+
+    // =========================[Semantic]
+    std::mutex mMutexSemantic;
+    Frame* mFrame;
+    // RGBD image
+    cv::Mat mImRGB, mImDepth, mImLabel, mImLabelColor, mImScore;
+    
+    // mImMask_debug: before dialate
+    cv::Mat mImMask, mImMaskOld;
+    int mnDynamicPoints;
+    int mnStaticPoints;
+    bool mbIsHasDynamicObject;
+
+    // whether semantic is ready
+    bool mbSemanticReady;
+    bool mbIsInsemanticQueue;
+
+    void InformSemanticReady(const bool bSemanticReady);
+    bool IsSemanticReady();
+
+    // ========================[Semantic] Update moving probability of map points
+    // Debug, with visualization
+    // void UpdateMovingProbability(KeyFrame* pKF);
+    // Return whether has dynamic object
+    void UpdatePrioriMovingProbability();
+
+    void UpdateBoW(KeyFrame* pKF);
+
 
     static long unsigned int nNextId;
     long unsigned int mnId;
@@ -128,6 +159,11 @@ public:
     // Variables used by the local mapping
     long unsigned int mnBALocalForKF;
     long unsigned int mnBAFixedForKF;
+
+    //========================semantic=============
+    long unsigned int mnBASemanticForKF;
+    long unsigned int mnBASemanticFixedForKF;
+    long unsigned int mnSemanticTrackReferenceForFrame;
 
     // Variables used by the keyframe database
     long unsigned int mnLoopQuery;
@@ -155,6 +191,11 @@ public:
     const std::vector<float> mvDepth; // negative value for monocular points
     const cv::Mat mDescriptors;
 
+    // ================================[Semantic] outliers of key points
+    std::vector<bool> mvbKptOutliers;
+    // Flag to identify outlier associations.
+    std::vector<bool> mvbOutlier;
+
     //BoW
     DBoW2::BowVector mBowVec;
     DBoW2::FeatureVector mFeatVec;
@@ -177,6 +218,11 @@ public:
     const int mnMaxY;
     const cv::Mat mK;
 
+    
+    // ==========================MapPoints associated to keypoints
+    std::vector<MapPoint*> mvpMapPoints;
+    std::vector<MapPoint*> mvpTemptMapPoints;
+
 
     // The following variables need to be accessed trough a mutex to be thread safe.
 protected:
@@ -189,7 +235,7 @@ protected:
     cv::Mat Cw; // Stereo middel point. Only for visualization
 
     // MapPoints associated to keypoints
-    std::vector<MapPoint*> mvpMapPoints;
+    //std::vector<MapPoint*> mvpMapPoints;
 
     // BoW
     KeyFrameDatabase* mpKeyFrameDB;
@@ -215,7 +261,10 @@ protected:
 
     float mHalfBaseline; // Only for visualization
 
+    //=============
     Map* mpMap;
+    std::mutex mMutexMap;
+
 
     std::mutex mMutexPose;
     std::mutex mMutexConnections;

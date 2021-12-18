@@ -8,12 +8,12 @@
 */
 
 
-#include<iostream>
-#include<algorithm>
-#include<fstream>
-#include<chrono>
+#include <iostream>
+#include <algorithm>
+#include <fstream>
+#include <chrono>
 #include <unistd.h>
-#include<opencv2/core/core.hpp>
+#include <opencv2/core/core.hpp>
 
 #include "Geometry.h"
 #include "MaskNet.h"
@@ -59,12 +59,12 @@ int main(int argc, char **argv)
     if (argc==6 || argc==7)
     {
         cout << "Loading Mask R-CNN. This could take a while..." << endl;
-        MaskNet = new DynaSLAM::SegmentDynObject();
+        MaskNet = new DynaSLAM::SegmentDynObject();     //创建函数对象，得到每一帧的分割结果
         cout << "Mask R-CNN loaded!" << endl;
     }
 
     // Create SLAM system. It initializes all system threads and gets ready to process frames.
-    ORB_SLAM2::System SLAM(argv[1],argv[2],ORB_SLAM2::System::RGBD,true);
+    ORB_SLAM2::System SLAM(argv[1],argv[2],ORB_SLAM2::System::RGBD, false);
 
     // Vector for tracking time statistics
     vector<float> vTimesTrack;
@@ -99,9 +99,8 @@ int main(int argc, char **argv)
     for(int ni=0; ni<nImages; ni++)
     {
         // Read image and depthmap from file
-        imRGB = cv::imread(string(argv[3])+"/"+vstrImageFilenamesRGB[ni],CV_LOAD_IMAGE_UNCHANGED);
-        imD = cv::imread(string(argv[3])+"/"+vstrImageFilenamesD[ni],CV_LOAD_IMAGE_UNCHANGED);
-
+        imRGB = cv::imread(string(argv[3])+"/"+vstrImageFilenamesRGB[ni], CV_LOAD_IMAGE_UNCHANGED);
+        imD = cv::imread(string(argv[3])+"/"+vstrImageFilenamesD[ni], CV_LOAD_IMAGE_UNCHANGED);
         double tframe = vTimestamps[ni];
 
         if(imRGB.empty())
@@ -111,32 +110,29 @@ int main(int argc, char **argv)
             return 1;
         }
 
-#ifdef COMPILEDWITHC11
         std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
-#else
-        std::chrono::monotonic_clock::time_point t1 = std::chrono::monotonic_clock::now();
-#endif
+
 
         // Segment out the images
         cv::Mat mask = cv::Mat::ones(480,640,CV_8U);
         if (argc == 6 || argc == 7)
         {
             cv::Mat maskRCNN;
-            maskRCNN = MaskNet->GetSegmentation(imRGB,string(argv[5]),vstrImageFilenamesRGB[ni].replace(0,4,""));
+            //maskRCNN数值在0-1，动态物体像素值是1
+            maskRCNN = MaskNet->GetSegmentation(imRGB, string(argv[5]), vstrImageFilenamesRGB[ni].replace(0,4,""));
             cv::Mat maskRCNNdil = maskRCNN.clone();
-            cv::dilate(maskRCNN,maskRCNNdil, kernel);
-            mask = mask - maskRCNNdil;
+            cout << "step 3" << endl;
+            cv::dilate(maskRCNN, maskRCNNdil, kernel);  // 读取mask结果出错
+            mask = mask - maskRCNNdil;  //求差，1表示静态物体
         }
 
-        // Pass the image to the SLAM system
+        // Pass the image to the SLAM system 
         if (argc == 7){SLAM.TrackRGBD(imRGB,imD,mask,tframe,imRGBOut,imDOut,maskOut);}
         else {SLAM.TrackRGBD(imRGB,imD,mask,tframe);}
 
-#ifdef COMPILEDWITHC11
+
         std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
-#else
-        std::chrono::monotonic_clock::time_point t2 = std::chrono::monotonic_clock::now();
-#endif
+
 
         if (argc == 7)
         {
@@ -190,7 +186,7 @@ void LoadImages(const string &strAssociationFilename, vector<string> &vstrImageF
     while(!fAssociation.eof())
     {
         string s;
-        getline(fAssociation,s);
+        getline(fAssociation, s);
         if(!s.empty())
         {
             stringstream ss;

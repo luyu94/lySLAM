@@ -26,16 +26,24 @@ Geometry::Geometry()
     }
 }
 
+//在深度图
 void Geometry::GeometricModelCorrection(const ORB_SLAM2::Frame &currentFrame,
                                         cv::Mat &imDepth, cv::Mat &mask){
+    //不知道当前帧的位姿，就不能把之前所有的关键帧投影到当前帧中
     if(currentFrame.mTcw.empty()){
         std::cout << "Geometry not working." << std::endl;
     }
+    //如果Geometry数据存储的帧超过5个（可以组成有效地图），就可以进行后面的步骤
     else if (mDB.mNumElem >= ELEM_INITIAL_MAP){
-        vector<ORB_SLAM2::Frame> vRefFrames = GetRefFrames(currentFrame);
-        vector<DynKeyPoint> vDynPoints = ExtractDynPoints(vRefFrames,currentFrame);
+        //选出和当前帧位姿、旋转最近的5个帧作为参考帧
+        vector<ORB_SLAM2::Frame> vRefFrames = GetRefFrames(currentFrame); //函数计算返回
+        vector<DynKeyPoint> vDynPoints = ExtractDynPoints(vRefFrames, currentFrame); //提取动态点
+        //以检测到的动态点为中心，对深度图进行区域增长，从而找到动态点所落在的动态物体上
+        //后续中，整个动态物体都会被去除
         mask = DepthRegionGrowing(vDynPoints,imDepth);
-        CombineMasks(currentFrame,mask);
+
+        //深度学习方法和几何方法得到Mask取并集
+        CombineMasks(currentFrame, mask);
     }
 }
 
@@ -45,6 +53,7 @@ void Geometry::InpaintFrames(const ORB_SLAM2::Frame &currentFrame,
     FillRGBD(currentFrame,mask,imGray,imDepth,imRGB);
 }
 
+//维护一个局部地图（默认20帧），当前帧是关键帧就加入到DataBase类变量mDB中
 void Geometry::GeometricModelUpdateDB(const ORB_SLAM2::Frame &currentFrame){
     if (currentFrame.mIsKeyFrame)
     {
@@ -52,25 +61,29 @@ void Geometry::GeometricModelUpdateDB(const ORB_SLAM2::Frame &currentFrame){
     }
 }
 
+
+// **取出和输入帧有高度重合的多个关键帧
 vector<ORB_SLAM2::Frame> Geometry::GetRefFrames(const ORB_SLAM2::Frame &currentFrame){
 
     cv::Mat rot1 = currentFrame.mTcw.rowRange(0,3).colRange(0,3);
-    cv::Mat eul1 = rotm2euler(rot1);
+    cv::Mat eul1 = rotm2euler(rot1);    //旋转矩阵转欧拉角
     cv::Mat trans1 = currentFrame.mTcw.rowRange(0,3).col(3);
     cv::Mat vDist;
     cv::Mat vRot;
 
     for (int i(0); i < mDB.mNumElem; i++){
+        //遍历数据库中的帧，求其到当前帧位姿（旋转平移）欧拉角的模长并存储
         cv::Mat rot2 = mDB.mvDataBase[i].mTcw.rowRange(0,3).colRange(0,3);
         cv::Mat eul2 = rotm2euler(rot2);
         double distRot = cv::norm(eul2,eul1,cv::NORM_L2);
-        vRot.push_back(distRot);
+        vRot.push_back(distRot);    //两帧之间旋转上的距离
 
         cv::Mat trans2 = mDB.mvDataBase[i].mTcw.rowRange(0,3).col(3);
         double dist = cv::norm(trans2,trans1,cv::NORM_L2);
-        vDist.push_back(dist);
+        vDist.push_back(dist);    //两帧之间位移上的距离，注意是存在Mat中
     }
 
+    //每一次都更新当前距离在最大距离所占的比例 0-1
     double minvDist, maxvDist;
     cv::minMaxLoc(vDist, &minvDist, &maxvDist);
     vDist /= maxvDist;
@@ -79,11 +92,11 @@ vector<ORB_SLAM2::Frame> Geometry::GetRefFrames(const ORB_SLAM2::Frame &currentF
     cv::minMaxLoc(vRot, &minvRot, &maxvRot);
     vRot /= maxvRot;
 
-    vDist = 0.7*vDist + 0.3*vRot;
+    vDist = 0.7*vDist + 0.3*vRot;   //算出针对当前帧的一个距离阈值
     cv::Mat vIndex;
-    cv::sortIdx(vDist,vIndex,CV_SORT_EVERY_COLUMN + CV_SORT_DESCENDING);
+    cv::sortIdx(vDist,vIndex,CV_SORT_EVERY_COLUMN + CV_SORT_DESCENDING);    //返回原矩阵的索引，进行队列排序
 
-    mnRefFrames = std::min(MAX_REF_FRAMES,vDist.rows);
+    mnRefFrames = std::min(MAX_REF_FRAMES, vDist.rows);     //
 
     vector<ORB_SLAM2::Frame> vRefFrames;
 
@@ -96,7 +109,7 @@ vector<ORB_SLAM2::Frame> Geometry::GetRefFrames(const ORB_SLAM2::Frame &currentF
     return(vRefFrames);
 }
 
-
+//利用几何方法提取动态点
 vector<Geometry::DynKeyPoint> Geometry::ExtractDynPoints(const vector<ORB_SLAM2::Frame> &vRefFrames,
                                                          const ORB_SLAM2::Frame &currentFrame){
     cv::Mat K = cv::Mat::eye(3,3,CV_32F);
@@ -105,8 +118,8 @@ vector<Geometry::DynKeyPoint> Geometry::ExtractDynPoints(const vector<ORB_SLAM2:
     K.at<float>(0,2) = currentFrame.cx;
     K.at<float>(1,2) = currentFrame.cy;
 
-    cv::Mat vAllMPw;
-    cv::Mat vAllMatRefFrame;
+    cv::Mat vAllMPw;    // 存储所有世界坐标系下的地图点
+    cv::Mat vAllMatRefFrame;    // 存储参考帧，关键点的u,v,1
     cv::Mat vAllLabels;
     cv::Mat vAllDepthRefFrame;
 
@@ -115,9 +128,13 @@ vector<Geometry::DynKeyPoint> Geometry::ExtractDynPoints(const vector<ORB_SLAM2:
         ORB_SLAM2::Frame refFrame = vRefFrames[i];
 
         // Fill matrix with points
+        // 存储单独一个参考帧的信息，坐标u,v,1
         cv::Mat matRefFrame(refFrame.N,3,CV_32F);
         cv::Mat matDepthRefFrame(refFrame.N,1,CV_32F);
         cv::Mat matInvDepthRefFrame(refFrame.N,1,CV_32F);
+
+        //参考帧中的有效关键点有k个，vLabels.at<k, 0>表示第k个有效关键点对应着
+        //原来该参考帧中的第i个关键点
         cv::Mat vLabels(refFrame.N,1,CV_32F);
         int k(0);
         for(int j(0); j < refFrame.N; j++){
@@ -125,6 +142,9 @@ vector<Geometry::DynKeyPoint> Geometry::ExtractDynPoints(const vector<ORB_SLAM2:
             const float &v = kp.pt.y;
             const float &u = kp.pt.x;
             const float d = refFrame.mImDepth.at<float>(v,u);
+
+            //深度单位是m
+            //S1:对参考帧点的深度进行筛选
             if (d > 0 && d < 6){
                 matRefFrame.at<float>(k,0) = refFrame.mvKeysUn[j].pt.x;
                 matRefFrame.at<float>(k,1) = refFrame.mvKeysUn[j].pt.y;

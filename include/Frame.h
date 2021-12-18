@@ -10,7 +10,7 @@
 #ifndef FRAME_H
 #define FRAME_H
 
-#include<vector>
+#include <vector>
 
 #include "MapPoint.h"
 #include "Thirdparty/DBoW2/DBoW2/BowVector.h"
@@ -20,6 +20,7 @@
 #include "ORBextractor.h"
 
 #include <opencv2/opencv.hpp>
+#include "SlamConfig.h"
 
 namespace ORB_SLAM2
 {
@@ -40,11 +41,8 @@ public:
     // Constructor for stereo cameras.
     Frame(const cv::Mat &imLeft, const cv::Mat &imRight, const cv::Mat &maskLeft, const cv::Mat &maskRight, const double &timeStamp, ORBextractor* extractorLeft, ORBextractor* extractorRight, ORBVocabulary* voc, cv::Mat &K, cv::Mat &distCoef, const float &bf, const float &thDepth);
 
-    // Constructor for RGB-D cameras.
-    Frame(const cv::Mat &imGray, const cv::Mat &imDepth, const cv::Mat &imMask, const double &timeStamp, ORBextractor* extractor, ORBVocabulary* voc, cv::Mat &K, cv::Mat &distCoef, const float &bf, const float &thDepth);
-
-    // Constructor for RGB-D cameras.
-    Frame(const cv::Mat &imGray, const cv::Mat &imDepth, const cv::Mat &imMask, const cv::Mat &imRGB, const double &timeStamp, ORBextractor* extractor, ORBVocabulary* voc, cv::Mat &K, cv::Mat &distCoef, const float &bf, const float &thDepth);
+    //=================semantic=====Constructor for RGB-D cameras===========
+    Frame(const cv::Mat& imRGB, const cv::Mat& imGray, const cv::Mat& imDepth, const double& timeStamp, ORBextractor* extractor, ORBVocabulary* voc, cv::Mat& K, cv::Mat& distCoef, const float& bf, const float& thDepth);
 
     // Constructor for Monocular cameras.
     Frame(const cv::Mat &imGray, const cv::Mat &mask, const double &timeStamp, ORBextractor* extractor, ORBVocabulary* voc, cv::Mat &K, cv::Mat &distCoef, const float &bf, const float &thDepth);
@@ -125,16 +123,27 @@ public:
 
     // Depth Image (Included by Berta).
     cv::Mat mImDepth;
-    bool mIsKeyFrame;
-    cv::Mat mImMask;
+    //bool mIsKeyFrame;
+    //cv::Mat mImMask;
     cv::Mat mImGray;
     cv::Mat mImRGB;
+    //=====================semantic=========================
+    cv::Mat mImLabel, mImScore;
+    cv::Mat mImMask;
+    bool mbIsKeyFrame;
+    bool mbIsTracked; // pose is estimated
+    // save the pointer to the keyframe if current frame is keyframe
+    KeyFrame* mGeneratedKeyFrame;
 
     // Vector of keypoints (original for visualization) and undistorted (actually used by the system).
     // In the stereo case, mvKeysUn is redundant as images must be rectified.
     // In the RGB-D case, RGB images can be distorted.
     std::vector<cv::KeyPoint> mvKeys, mvKeysRight;
     std::vector<cv::KeyPoint> mvKeysUn;
+
+    //=========[Semantic] outliers of key points===========
+    std::vector<bool> mvbKptOutliers;
+    bool IsInImage(const float& x, const float& y) const;
 
     // Corresponding stereo coordinate and depth for each keypoint.
     // "Monocular" keypoints have a negative value.

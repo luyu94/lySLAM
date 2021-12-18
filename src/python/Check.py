@@ -11,10 +11,14 @@ import coco
 import utils
 import model as modellib
 
-print 'Initializing Mask RCNN network...'
+#warning:Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2 FMA
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+
+print ('Initializing Mask RCNN network...')
 # Root directory of the project
 ROOT_DIR = os.getcwd()
-ROOT_DIR = "./src/python"
+print(ROOT_DIR)
+ROOT_DIR = "/mnt/DynaSLAM/src/python"
 print(ROOT_DIR)
 
 # Directory to save logs and trained model
@@ -53,87 +57,88 @@ class_names = ['BG', 'person', 'bicycle', 'car', 'motorcycle', 'airplane',
        'keyboard', 'cell phone', 'microwave', 'oven', 'toaster',
        'sink', 'refrigerator', 'book', 'clock', 'vase', 'scissors',
        'teddy bear', 'hair drier', 'toothbrush']
-print 'Initialated Mask RCNN network...'
+print ('Initialated Mask RCNN network...')
 
 def GetDynSeg(image,image2=None):
-	h = image.shape[0]
-	w = image.shape[1]
-	if len(image.shape) == 2:
-		im = np.zeros((h,w,3))
-		im[:,:,0]=image
-		im[:,:,1]=image
-		im[:,:,2]=image
-		image = im
-	#if image2 is not None:
-	#	args+=[image2]
-	# Run detection
-	results = model.detect([image], verbose=0)
-	# Visualize results
-	r = results[0]
-	i = 0
-	mask = np.zeros((h,w))
-	for roi in r['rois']:
-		if class_names[r['class_ids'][i]] == 'person':
-			image_m = r['masks'][:,:,i]
-			mask[image_m == 1] = 1.
-		if class_names[r['class_ids'][i]] == 'bicycle':
-			image_m = r['masks'][:,:,i]
-			mask[image_m == 1] = 1.
-		if class_names[r['class_ids'][i]] == 'car':
-			image_m = r['masks'][:,:,i]
-			mask[image_m == 1] = 1.
-		if class_names[r['class_ids'][i]] == 'motorcycle':
-			image_m = r['masks'][:,:,i]
-			mask[image_m == 1] = 1.
-		if class_names[r['class_ids'][i]] == 'airplane':
-			image_m = r['masks'][:,:,i]
-			mask[image_m == 1] = 1.
-		if class_names[r['class_ids'][i]] == 'bus':
-			image_m = r['masks'][:,:,i]
-			mask[image_m == 1] = 1.
-		if class_names[r['class_ids'][i]] == 'train':
-			image_m = r['masks'][:,:,i]
-			mask[image_m == 1] = 1.
-		if class_names[r['class_ids'][i]] == 'truck':
-			image_m = r['masks'][:,:,i]
-			mask[image_m == 1] = 1.
-		if class_names[r['class_ids'][i]] == 'boat':
-			image_m = r['masks'][:,:,i]
-			mask[image_m == 1] = 1.
-		if class_names[r['class_ids'][i]] == 'bird':
-			image_m = r['masks'][:,:,i]
-			mask[image_m == 1] = 1.
-		if class_names[r['class_ids'][i]] == 'cat':
-			image_m = r['masks'][:,:,i]
-			mask[image_m == 1] = 1.
-		if class_names[r['class_ids'][i]] == 'dog':
-			image_m = r['masks'][:,:,i]
-			mask[image_m == 1] = 1.
-		if class_names[r['class_ids'][i]] == 'horse':
-			image_m = r['masks'][:,:,i]
-			mask[image_m == 1] = 1.
-		if class_names[r['class_ids'][i]] == 'sheep':
-			image_m = r['masks'][:,:,i]
-			mask[image_m == 1] = 1.
-		if class_names[r['class_ids'][i]] == 'cow':
-			image_m = r['masks'][:,:,i]
-			mask[image_m == 1] = 1.
-		if class_names[r['class_ids'][i]] == 'elephant':
-			image_m = r['masks'][:,:,i]
-			mask[image_m == 1] = 1.
-		if class_names[r['class_ids'][i]] == 'bear':
-			image_m = r['masks'][:,:,i]
-			mask[image_m == 1] = 1.
-		if class_names[r['class_ids'][i]] == 'zebra':
-			image_m = r['masks'][:,:,i]
-			mask[image_m == 1] = 1.
-		if class_names[r['class_ids'][i]] == 'giraffe':
-			image_m = r['masks'][:,:,i]
-			mask[image_m == 1] = 1.		
-		i+=1
-	#print('GetSeg mask shape:',mask.shape)
+    print('PruebaPython')
+    h = image.shape[0]
+    w = image.shape[1]
+    if len(image.shape) == 2:
+        im = np.zeros((h,w,3))
+        im[:,:,0]=image
+        im[:,:,1]=image
+        im[:,:,2]=image
+        image = im
+    #if image2 is not None:
+    #   args+=[image2]
+    # Run detection
+    results = model.detect([image], verbose=0)
+    # Visualize results
+    r = results[0]
+    i = 0
+    mask = np.zeros((h,w))
+    for roi in r['rois']:
+        if class_names[r['class_ids'][i]] == 'person':
+            image_m = r['masks'][:,:,i]
+            mask[image_m == 1] = 1.
+        if class_names[r['class_ids'][i]] == 'bicycle':
+            image_m = r['masks'][:,:,i]
+            mask[image_m == 1] = 1.
+        if class_names[r['class_ids'][i]] == 'car':
+            image_m = r['masks'][:,:,i]
+            mask[image_m == 1] = 1.
+        if class_names[r['class_ids'][i]] == 'motorcycle':
+            image_m = r['masks'][:,:,i]
+            mask[image_m == 1] = 1.
+        if class_names[r['class_ids'][i]] == 'airplane':
+            image_m = r['masks'][:,:,i]
+            mask[image_m == 1] = 1.
+        if class_names[r['class_ids'][i]] == 'bus':
+            image_m = r['masks'][:,:,i]
+            mask[image_m == 1] = 1.
+        if class_names[r['class_ids'][i]] == 'train':
+            image_m = r['masks'][:,:,i]
+            mask[image_m == 1] = 1.
+        if class_names[r['class_ids'][i]] == 'truck':
+            image_m = r['masks'][:,:,i]
+            mask[image_m == 1] = 1.
+        if class_names[r['class_ids'][i]] == 'boat':
+            image_m = r['masks'][:,:,i]
+            mask[image_m == 1] = 1.
+        if class_names[r['class_ids'][i]] == 'bird':
+            image_m = r['masks'][:,:,i]
+            mask[image_m == 1] = 1.
+        if class_names[r['class_ids'][i]] == 'cat':
+            image_m = r['masks'][:,:,i]
+            mask[image_m == 1] = 1.
+        if class_names[r['class_ids'][i]] == 'dog':
+            image_m = r['masks'][:,:,i]
+            mask[image_m == 1] = 1.
+        if class_names[r['class_ids'][i]] == 'horse':
+            image_m = r['masks'][:,:,i]
+            mask[image_m == 1] = 1.
+        if class_names[r['class_ids'][i]] == 'sheep':
+            image_m = r['masks'][:,:,i]
+            mask[image_m == 1] = 1.
+        if class_names[r['class_ids'][i]] == 'cow':
+            image_m = r['masks'][:,:,i]
+            mask[image_m == 1] = 1.
+        if class_names[r['class_ids'][i]] == 'elephant':
+            image_m = r['masks'][:,:,i]
+            mask[image_m == 1] = 1.
+        if class_names[r['class_ids'][i]] == 'bear':
+            image_m = r['masks'][:,:,i]
+            mask[image_m == 1] = 1.
+        if class_names[r['class_ids'][i]] == 'zebra':
+            image_m = r['masks'][:,:,i]
+            mask[image_m == 1] = 1.
+        if class_names[r['class_ids'][i]] == 'giraffe':
+            image_m = r['masks'][:,:,i]
+            mask[image_m == 1] = 1.     
+        i+=1
+    #print('GetSeg mask shape:',mask.shape)
 
-	return mask
+    return mask
 
 im = np.zeros((480,640,3))
 mask = GetDynSeg(im)

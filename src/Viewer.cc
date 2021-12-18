@@ -124,8 +124,8 @@ void Viewer::Run()
         pangolin::FinishFrame();
 
         cv::Mat im = mpFrameDrawer->DrawFrame();
-        cv::imshow("DynaSLAM: Current Frame",im);
-        cv::waitKey(mT);
+        // cv::imshow("DynaSLAM: Current Frame",im);
+        // cv::waitKey(mT);
 
         if(menuReset)
         {

@@ -10,32 +10,42 @@
 
 #include "Tracking.h"
 
-#include<opencv2/core/core.hpp>
-#include<opencv2/features2d/features2d.hpp>
+#include <opencv2/core/core.hpp>
+#include <opencv2/features2d/features2d.hpp>
 #include <unistd.h>
-#include"ORBmatcher.h"
-#include"FrameDrawer.h"
-#include"Converter.h"
-#include"Map.h"
-#include"Initializer.h"
+#include "Frame.h"
+#include "ORBmatcher.h"
+#include "FrameDrawer.h"
+#include "Converter.h"
+#include "Map.h"
+#include "Initializer.h"
 
-#include"Optimizer.h"
-#include"PnPsolver.h"
+#include "Optimizer.h"
+#include "PnPsolver.h"
 
-#include<iostream>
+#include <iostream>
 
-#include<mutex>
-
+#include <mutex>
+#include "Semantic.h"
 
 using namespace std;
 
 namespace ORB_SLAM2
 {
 
-Tracking::Tracking(System *pSys, ORBVocabulary* pVoc, FrameDrawer *pFrameDrawer, MapDrawer *pMapDrawer, Map *pMap, KeyFrameDatabase* pKFDB, const string &strSettingPath, const int sensor):
-    mState(NO_IMAGES_YET), mSensor(sensor), mbOnlyTracking(false), mbVO(false), mpORBVocabulary(pVoc),
-    mpKeyFrameDB(pKFDB), mpInitializer(static_cast<Initializer*>(NULL)), mpSystem(pSys), mpViewer(NULL),
-    mpFrameDrawer(pFrameDrawer), mpMapDrawer(pMapDrawer), mpMap(pMap), mnLastRelocFrameId(0)
+Tracking::Tracking(System *pSys, ORBVocabulary* pVoc, FrameDrawer *pFrameDrawer, MapDrawer *pMapDrawer, Map *pMap, KeyFrameDatabase* pKFDB, const string &strSettingPath, const int sensor)
+    : mState(NO_IMAGES_YET)
+    , mSensor(sensor)
+    , mbOnlyTracking(false)
+    , mbVO(false)
+    , mpORBVocabulary(pVoc)
+    , mpKeyFrameDB(pKFDB)
+    , mpInitializer(static_cast<Initializer*>(NULL))
+    , mpSystem(pSys), mpViewer(NULL)
+    , mpFrameDrawer(pFrameDrawer)
+    , mpMapDrawer(pMapDrawer)
+    , mpMap(pMap)
+    , mnLastRelocFrameId(0)
 {
     // Load camera parameters from settings file
 
@@ -203,14 +213,11 @@ cv::Mat Tracking::GrabImageStereo(const cv::Mat &imRectLeft, const cv::Mat &imRe
 }
 
 
-cv::Mat Tracking::GrabImageRGBD(const cv::Mat &imRGB,const cv::Mat &imD, cv::Mat &mask,
-                                const double &timestamp, cv::Mat &imRGBOut,
-                                cv::Mat &imDOut, cv::Mat &maskOut)
+cv::Mat Tracking::GrabImageRGBD(const cv::Mat &imRGB,const cv::Mat &imD, const double &timestamp)
 {
     mImGray = imRGB;
+    mImRGB = imRGB;
     cv::Mat imDepth = imD;
-    cv::Mat imMask = mask;
-    cv::Mat _imRGB = imRGB;
 
     if(mImGray.channels()==3)
     {
@@ -230,73 +237,10 @@ cv::Mat Tracking::GrabImageRGBD(const cv::Mat &imRGB,const cv::Mat &imD, cv::Mat
     if((fabs(mDepthMapFactor-1.0f)>1e-5) || imDepth.type()!=CV_32F)
         imDepth.convertTo(imDepth,CV_32F,mDepthMapFactor);
 
-    mCurrentFrame = Frame(mImGray,imDepth,imMask,_imRGB,timestamp,mpORBextractorLeft,mpORBVocabulary,mK,mDistCoef,mbf,mThDepth);
-
-    LightTrack();
-
-    imRGBOut = _imRGB;
-
-
-
-    if (!mCurrentFrame.mTcw.empty())
-    {
-        mGeometry.GeometricModelCorrection(mCurrentFrame,imDepth,imMask);
-    }
-
-    mCurrentFrame = Frame(mImGray,imDepth,imMask,imRGBOut,timestamp,mpORBextractorLeft,mpORBVocabulary,mK,mDistCoef,mbf,mThDepth);
+    //============================semantic===============================
+    mCurrentFrame = Frame(mImRGB, mImGray, imDepth, timestamp, mpORBextractorLeft, mpORBVocabulary, mK, mDistCoef, mbf, mThDepth);
 
     Track();
-
-    if (!mCurrentFrame.mTcw.empty())
-    {
-        mGeometry.InpaintFrames(mCurrentFrame, mImGray, imDepth, imRGBOut, imMask);
-    }
-
-    mGeometry.GeometricModelUpdateDB(mCurrentFrame);
-
-    imDOut = imDepth;
-    imDepth.convertTo(imDOut,CV_16U,1./mDepthMapFactor);
-    maskOut = imMask;
-
-    return mCurrentFrame.mTcw.clone();
-}
-
-cv::Mat Tracking::GrabImageRGBD(const cv::Mat &imRGB,const cv::Mat &imD, cv::Mat &mask,
-                                const double &timestamp)
-{
-    mImGray = imRGB;
-    cv::Mat imDepth = imD;
-    cv::Mat imMask = mask;
-
-    if(mImGray.channels()==3)
-    {
-        if(mbRGB)
-            cvtColor(mImGray,mImGray,CV_RGB2GRAY);
-        else
-            cvtColor(mImGray,mImGray,CV_BGR2GRAY);
-    }
-    else if(mImGray.channels()==4)
-    {
-        if(mbRGB)
-            cvtColor(mImGray,mImGray,CV_RGBA2GRAY);
-        else
-            cvtColor(mImGray,mImGray,CV_BGRA2GRAY);
-    }
-
-    if((fabs(mDepthMapFactor-1.0f)>1e-5) || imDepth.type()!=CV_32F)
-        imDepth.convertTo(imDepth,CV_32F,mDepthMapFactor);
-
-    mCurrentFrame = Frame(mImGray,imDepth,imMask,timestamp,mpORBextractorLeft,mpORBVocabulary,mK,mDistCoef,mbf,mThDepth);
-
-    LightTrack();
-
-    mGeometry.GeometricModelCorrection(mCurrentFrame,mImGray,imMask);
-
-    mCurrentFrame = Frame(mImGray,imDepth,imMask,timestamp,mpORBextractorLeft,mpORBVocabulary,mK,mDistCoef,mbf,mThDepth);
-
-    Track();
-
-    mGeometry.GeometricModelUpdateDB(mCurrentFrame);
 
     return mCurrentFrame.mTcw.clone();
 }
@@ -349,7 +293,6 @@ void Tracking::Track()
 
     // Get Map Mutex -> Map cannot be changed
     unique_lock<mutex> lock(mpMap->mMutexMapUpdate);
-
 
     if(mState==NOT_INITIALIZED)
     {
@@ -1106,6 +1049,7 @@ bool Tracking::LightTrackWithMotionModel(bool &bVO)
     return nmatches>20;
 
 }
+
 bool Tracking::TrackWithMotionModel()
 {
     ORBmatcher matcher(0.9,true);
@@ -1830,6 +1774,402 @@ void Tracking::InformOnlyTracking(const bool &flag)
     mbOnlyTracking = flag;
 }
 
+//============================PredictSemanticMask===============================
+void Tracking::PredictSemanticMask(KeyFrame* lastKF, KeyFrame* currentKF)
+{
+    std::vector<cv::Point> vBackground;
+    std::vector<cv::Point> vForeground;
+    vBackground.reserve(currentKF->N);
+    vForeground.reserve(currentKF->N);
+
+    // cv::Mat showProject = currentKF->mImRGB.clone();
+    cv::Mat showCurrent = currentKF->mImRGB.clone();
+
+    ORBmatcher matcher(0.9, true);
+
+    // Search by projection
+    int nmatches = 0;
+    cv::Mat Rcw = lastKF->GetPose().rowRange(0, 3).colRange(0, 3);
+    cv::Mat tcw = lastKF->GetPose().rowRange(0, 3).col(3);
+    cv::Mat Ow = -Rcw.t() * tcw;
+    for (size_t i = 0; i < currentKF->N; i++) {
+        MapPoint* pMP = currentKF->mvpMapPoints[i];
+        bool bCreateNew = false;
+        if (!pMP) {
+            bCreateNew = true;
+        } else {
+            if (pMP->isBad()) {
+                bCreateNew = true;
+            }
+        }
+
+        if (bCreateNew) {
+            float z;
+            z = currentKF->mvDepth[i];
+            if (z < 0) {
+                continue;
+            }
+            cv::Mat x3D = currentKF->UnprojectStereo(i);
+            Map *mpMP;
+            pMP = new MapPoint(x3D, currentKF, mpMP->GetCurrentMap());
+
+            currentKF->mvpMapPoints[i] = pMP;
+            pMP->ComputeDistinctiveDescriptors();
+            pMP->UpdateNormalAndDepth();
+            currentKF->mvpTemptMapPoints.push_back(pMP);
+        }
+
+        // project
+        cv::Mat x3Dw = pMP->GetWorldPos();
+        cv::Mat x3Dc = Rcw * x3Dw + tcw;
+
+        const float &PcX = x3Dc.at<float>(0);
+        const float &PcY = x3Dc.at<float>(1);
+        const float &PcZ = x3Dc.at<float>(2);
+
+        if(PcZ<0.0f)
+            continue;
+
+        //*****????=====================================================
+        //cv::Point2f uv = lastKF->mpCamera->project(x3Dc);
+        const float invz = 1.0f/PcZ;
+        cv::Point2f uv;
+        uv.x = fx * PcX * invz + cx;
+        uv.y = fy*PcY*invz+cy;
+
+        if (uv.x < lastKF->mnMinX || uv.x > lastKF->mnMaxX)
+            continue;
+        if (uv.y < lastKF->mnMinY || uv.y > lastKF->mnMaxY)
+            continue;
+
+        cv::Mat PO = x3Dw - Ow;
+        float dist3D = cv::norm(PO);
+
+        const float maxDistance = pMP->GetMaxDistanceInvariance();
+        const float minDistance = pMP->GetMinDistanceInvariance();
+
+        // Depth must be inside the scale pyramid of the image
+        if (dist3D < minDistance || dist3D > maxDistance)
+            continue;
+
+        int nPredictedLevel = pMP->PredictScale(dist3D, lastKF);
+        // Search in a window
+        int th = 15;
+        const float radius = th * lastKF->mvScaleFactors[nPredictedLevel];
+        const vector<size_t> vIndices2 = lastKF->GetFeaturesInArea(uv.x, uv.y, radius);
+        if (vIndices2.empty())
+            continue;
+        const cv::Mat dMP = pMP->GetDescriptor();
+
+        int bestDist = 256;
+        int bestIdx2 = -1;
+
+        for (vector<size_t>::const_iterator vit = vIndices2.begin(); vit != vIndices2.end(); vit++) {
+            const size_t i2 = *vit;
+            // if (currentKF->mvpMapPoints[i2])
+            //     continue;
+            const cv::Mat& d = lastKF->mDescriptors.row(i2);
+
+            const int dist = ORBmatcher::DescriptorDistance(dMP, d);
+
+            if (dist < bestDist) {
+                bestDist = dist;
+                bestIdx2 = i2;
+            }
+            // TH_HIGH = 100
+            if (bestDist <= 100) {
+                cv::KeyPoint kp1 = currentKF->mvKeys[i];
+                if (lastKF->mvbKptOutliers[bestIdx2]) {
+                    cv::circle(showCurrent, kp1.pt, 2, cv::Scalar(0, 0, 255), -1);
+                    vForeground.push_back(kp1.pt);
+                    // update outlier information
+                    currentKF->mvbKptOutliers[i] = true;
+                    pMP->mMovingProbability = 1;
+                    pMP->SetBadFlag();
+                } else {
+                    cv::circle(showCurrent, kp1.pt, 2, cv::Scalar(255, 0, 0), -1);
+                    vBackground.push_back(kp1.pt);
+                }
+            }
+
+            // TODO update covision graph
+            // if (!currentKF->mvpTemptMapPoints[bestIdx2])
+            //     currentKF->mvpTemptMapPoints[bestIdx2] = pMP;
+            nmatches++;
+        }
+    }
+
+    if (nmatches < 20) {
+        currentKF->mImMask = cv::Mat::zeros(currentKF->mImRGB.size(), CV_8UC1);
+        // currentKF->bIsHasMask = false;
+        // LOG(WARNING) << "Fame ID: " << currentKF->mnId << " No enough matched features: " << nmatches;
+        return;
+    }
+
+    // generate mask using grabcut
+    cv::Mat grab_mask, binMask, res, bgdModel, fgdModel;
+    grab_mask = cv::Mat::zeros(currentKF->mImRGB.size(), CV_8UC1);
+    cv::Rect rect(0, 0, currentKF->mImRGB.cols - 1, currentKF->mImRGB.rows - 1);
+
+    // for (int i = 0; i < currentKF->mImRGB.rows; i++)
+    //     for (int j = 0; j < currentKF->mImRGB.cols; j++) {
+    //         if (lastKF->mImMask.empty())
+    //             break;
+    //         if (i <= 0 || i >= lastKF->mImMask.rows)
+    //             continue;
+    //         if (j <= 0 || j >= lastKF->mImMask.cols)
+    //             continue;
+    //         int m = lastKF->mImMask.at<uchar>(i, j);
+    //         if (m == 255) {
+    //             cv::circle(grab_mask, cv::Point(j, i), 2, cv::GC_PR_FGD, -1);
+    //         } else {
+    //             cv::circle(grab_mask, cv::Point(j, i), 2, cv::GC_PR_BGD, -1);
+    //         }
+    //     }
+
+    for (size_t i = 0; i < vForeground.size(); i++) {
+        cv::circle(grab_mask, vForeground[i], 2, cv::GC_FGD, -1);
+    }
+    for (size_t i = 0; i < vBackground.size(); i++) {
+        cv::circle(grab_mask, vBackground[i], 2, cv::GC_BGD, -1);
+    }
+    cv::grabCut(currentKF->mImRGB, grab_mask, rect, bgdModel, fgdModel, 1);
+
+    Semantic::getBinMask(grab_mask, binMask);
+    currentKF->mImRGB.copyTo(res, binMask);
+
+    // should always true
+    if (!currentKF->IsSemanticReady()) {
+        currentKF->mImMask = binMask;
+        Config::GetInstance()->saveImage(res, "debug", "fgd_" + std::to_string(currentKF->mnId) + ".png");
+    }
+
+    // Config::GetInstance()->saveImage(showCurrent, "debug", "cur_" + std::to_string(currentKF->mnId) + ".png");
+    // cv::imshow("KeyFrame", showCurrent);
+}
+
+//======================================
+void Tracking::PredictFeatureProbability(KeyFrame* lastKF, KeyFrame* currentKF)
+{
+    cv::Mat showCurrent = currentKF->mImRGB.clone();
+
+    ORBmatcher matcher(0.9, true);
+
+    // Search by projection
+    int nmatches = 0;
+    cv::Mat Rcw = lastKF->GetPose().rowRange(0, 3).colRange(0, 3);
+    cv::Mat tcw = lastKF->GetPose().rowRange(0, 3).col(3);
+    cv::Mat Ow = -Rcw.t() * tcw;
+    for (size_t i = 0; i < currentKF->N; i++) {
+        MapPoint* pMP = currentKF->mvpMapPoints[i];
+        if (!pMP)
+            continue;
+        if (pMP->isBad())
+            continue;
+
+        // project
+        cv::Mat x3Dw = pMP->GetWorldPos();
+        cv::Mat x3Dc = Rcw * x3Dw + tcw;
+
+        //cv::Point2f uv = lastKF->mpCamera->project(x3Dc);
+        const float &PcX = x3Dc.at<float>(0);
+        const float &PcY = x3Dc.at<float>(1);
+        const float &PcZ = x3Dc.at<float>(2);
+
+        if(PcZ<0.0f)
+            continue;
+
+        //*****????=====================================================
+        //cv::Point2f uv = lastKF->mpCamera->project(x3Dc);
+        const float invz = 1.0f/PcZ;
+        cv::Point2f uv;
+        uv.x = fx * PcX * invz + cx;
+        uv.y = fy*PcY*invz+cy;
 
 
-} //namespace ORB_SLAM
+        if (uv.x < lastKF->mnMinX || uv.x > lastKF->mnMaxX)
+            continue;
+        if (uv.y < lastKF->mnMinY || uv.y > lastKF->mnMaxY)
+            continue;
+
+        // if (pMP->mMovingProbability == 1) {
+        //     cv::circle(showProject, uv, 2, cv::Scalar(0, 0, 255), -1);
+        // } else {
+        //     if (pMP->mMovingProbability == 0) {
+        //         cv::circle(showProject, uv, 2, cv::Scalar(255, 0, 0), -1);
+        //     } else {
+        //         cv::circle(showProject, uv, 2, cv::Scalar(0, 255, 0), -1);
+        //     }
+        // }
+
+        cv::Mat PO = x3Dw - Ow;
+        float dist3D = cv::norm(PO);
+
+        const float maxDistance = pMP->GetMaxDistanceInvariance();
+        const float minDistance = pMP->GetMinDistanceInvariance();
+
+        // Depth must be inside the scale pyramid of the image
+        if (dist3D < minDistance || dist3D > maxDistance)
+            continue;
+
+        int nPredictedLevel = pMP->PredictScale(dist3D, lastKF);
+        // Search in a window
+        int th = 15;
+        const float radius = th * lastKF->mvScaleFactors[nPredictedLevel];
+        const vector<size_t> vIndices2 = lastKF->GetFeaturesInArea(uv.x, uv.y, radius);
+        if (vIndices2.empty())
+            continue;
+        const cv::Mat dMP = pMP->GetDescriptor();
+
+        int bestDist = 256;
+        int bestIdx2 = -1;
+
+        for (vector<size_t>::const_iterator vit = vIndices2.begin(); vit != vIndices2.end(); vit++) {
+            const size_t i2 = *vit;
+            const cv::Mat& d = lastKF->mDescriptors.row(i2);
+            const int dist = ORBmatcher::DescriptorDistance(dMP, d);
+
+            if (dist < bestDist) {
+                bestDist = dist;
+                bestIdx2 = i2;
+            }
+            // TH_HIGH = 100
+            if (bestDist <= 100) {
+                cv::KeyPoint kp2 = currentKF->mvKeys[i];
+
+                if (lastKF->mvbKptOutliers[bestIdx2]) {
+                    cv::circle(showCurrent, kp2.pt, 2, cv::Scalar(0, 0, 255), -1);
+                    pMP->mMovingProbability = 1;
+                    currentKF->EraseMapPointMatch(i);
+                }
+                // else {
+                //     cv::circle(showCurrent, kp2.pt, 2, cv::Scalar(255, 0, 0), -1);
+                //     pMP->mMovingProbability = 0;
+                // }
+            }
+
+            // TODO update covision graph
+            // if (!currentKF->mvpTemptMapPoints[bestIdx2])
+            //     currentKF->mvpTemptMapPoints[bestIdx2] = pMP;
+            nmatches++;
+        }
+    }
+    // TODO how to do if no enough matches
+    if (nmatches < 20) {
+        LOG(WARNING) << "Fame ID: " << currentKF->mnId << " No enough matched features: " << nmatches;
+        return;
+    }
+    // Config::GetInstance()->saveImage(showProject, "debug", "project_" + std::to_string(currentKF->mnId) + ".png");
+    // cv::imshow("show project", showProject);
+    Config::GetInstance()->saveImage(showCurrent, "debug", "skip_" + std::to_string(currentKF->mnId) + ".png");
+    // cv::imshow("KeyFrame skiped", showCurrent);
+}
+
+// ======================== Semantic================
+void Tracking::PoseOptimization(KeyFrame* currentKF, bool bUpdateMap)
+{
+   // Optimize one key frame
+    Optimizer::PoseOptimization(currentKF, bUpdateMap);
+}
+
+// ======================Semantic=====================
+void Tracking::SemanticBA(KeyFrame* currentKF)
+{
+    int num_FixedKF_BA = 0;
+    bool mbAortBA = false;
+    Optimizer::SemanticBundleAdjustment(currentKF, &mbAortBA, currentKF->GetMap(), num_FixedKF_BA);
+}
+
+//======================Semantic  UpdateLocalKeyFrames===============
+void Tracking::SemanticUpdateLocalKeyFrames(KeyFrame& currentKF)
+{
+    map<KeyFrame*, int> keyframeCounter;    //指向某一关键帧，序号
+    for (int i = 0; i < currentKF.N; i++) 
+    { //遍历当前帧所有KeyPoints
+        MapPoint* pMP = currentKF.mvpMapPoints[i];
+        if (pMP) {
+            if (!pMP->isBad()) {    //如果当前MP不是坏点
+                if (Semantic::GetInstance()->IsDynamicMapPoint(pMP))    //如果是动态点就跳出
+                    continue;
+
+                const map<KeyFrame*, size_t> observations = pMP->GetObservations();   //索引关联
+                for (map<KeyFrame*,size_t>::const_iterator it = observations.begin(), itend = observations.end(); it != itend; it++)
+                    keyframeCounter[it->first]++;   //数据存储在keyframeCounter
+            } else {
+                currentKF.mvpMapPoints[i] = NULL;
+            }
+        }
+    }
+
+    if(keyframeCounter.empty())
+        return;
+
+    int max=0;
+    KeyFrame* pKFmax= static_cast<KeyFrame*>(NULL);
+
+    mvpSemanticLocalKeyFrames.clear();
+    mvpSemanticLocalKeyFrames.reserve(3 * keyframeCounter.size());
+
+    // All keyframes that observe a map point are included in the local map. Also check which keyframe shares most points
+    for (map<KeyFrame *, int>::const_iterator it = keyframeCounter.begin(), itEnd = keyframeCounter.end(); it != itEnd; it++)
+    {
+        KeyFrame* pKF = it->first;
+
+        if (pKF->isBad())
+            continue;
+
+        mvpSemanticLocalKeyFrames.push_back(pKF);
+        pKF->mnSemanticTrackReferenceForFrame = currentKF.mnId;
+    }
+
+    // Include also some not-already-included keyframes that are neighbors to already-included keyframes
+    for (vector<KeyFrame *>::const_iterator itKF = mvpSemanticLocalKeyFrames.begin(), itEndKF = mvpSemanticLocalKeyFrames.end(); itKF != itEndKF; itKF++)
+    {
+        if (mvpSemanticLocalKeyFrames.size() > 80) // 80
+            break;
+
+        KeyFrame* pKF = *itKF;
+
+        const vector<KeyFrame*> vNeighs = pKF->GetBestCovisibilityKeyFrames(10);
+
+        for (vector<KeyFrame *>::const_iterator itNeighKF = vNeighs.begin(), itEndNeighKF = vNeighs.end(); itNeighKF != itEndNeighKF; itNeighKF++) {
+            KeyFrame* pNeighKF = *itNeighKF;
+            if (!pNeighKF->isBad()) {
+                if (pNeighKF->mnSemanticTrackReferenceForFrame != currentKF.mnId) {
+                    mvpSemanticLocalKeyFrames.push_back(pNeighKF);
+                    pNeighKF->mnSemanticTrackReferenceForFrame = currentKF.mnId;
+                    continue;   //源代码是break
+                }
+            }
+        }
+
+        const set<KeyFrame*> spChilds = pKF->GetChilds();
+        for (set<KeyFrame *>::const_iterator sit = spChilds.begin(), send = spChilds.end(); sit != send; sit++) {
+            KeyFrame* pChildKF = *sit;
+            if (!pChildKF->isBad()) {
+                if (pChildKF->mnSemanticTrackReferenceForFrame != currentKF.mnId) {
+                    mvpSemanticLocalKeyFrames.push_back(pChildKF);
+                    pChildKF->mnSemanticTrackReferenceForFrame = currentKF.mnId;
+                    continue;
+                }
+            }
+        }
+
+        KeyFrame* pParent = pKF->GetParent();
+        if (pParent) {
+            if (pParent->mnSemanticTrackReferenceForFrame != currentKF.mnId) {
+                mvpSemanticLocalKeyFrames.push_back(pParent);
+                pParent->mnSemanticTrackReferenceForFrame = mCurrentFrame.mnId;
+                continue;
+            }
+        }
+    }
+    
+    if(pKFmax)
+    {
+        mpReferenceKF = pKFmax;
+        mCurrentFrame.mpReferenceKF = mpReferenceKF;
+    }
+}
+
+} //namespace ORB_SLAM2

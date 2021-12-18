@@ -12,6 +12,8 @@
 #include "ORBmatcher.h"
 #include <thread>
 
+#include "Semantic.h"
+
 namespace ORB_SLAM2
 {
 
@@ -36,7 +38,7 @@ Frame::Frame(const Frame &frame)
      mpReferenceKF(frame.mpReferenceKF), mnScaleLevels(frame.mnScaleLevels), mImRGB(frame.mImRGB),
      mfScaleFactor(frame.mfScaleFactor), mfLogScaleFactor(frame.mfLogScaleFactor), mImGray(frame.mImGray),
      mvScaleFactors(frame.mvScaleFactors), mvInvScaleFactors(frame.mvInvScaleFactors),mImMask(frame.mImMask),
-     mvLevelSigma2(frame.mvLevelSigma2), mvInvLevelSigma2(frame.mvInvLevelSigma2),mIsKeyFrame(frame.mIsKeyFrame),mImDepth(frame.mImDepth)
+     mvLevelSigma2(frame.mvLevelSigma2), mvInvLevelSigma2(frame.mvInvLevelSigma2),mbIsKeyFrame(frame.mbIsKeyFrame),mImDepth(frame.mImDepth)
 {
     for(int i=0;i<FRAME_GRID_COLS;i++)
         for(int j=0; j<FRAME_GRID_ROWS; j++)
@@ -151,11 +153,27 @@ Frame::Frame(const cv::Mat &imLeft, const cv::Mat &imRight, const cv::Mat &maskL
     AssignFeaturesToGrid();
 }
 
-Frame::Frame(const cv::Mat &imGray, const cv::Mat &imDepth, const cv::Mat &imMask, const double &timeStamp,  ORBextractor* extractor, ORBVocabulary* voc,
+//================semantic=======Constructor for RGB-D cameras================
+Frame::Frame(const cv::Mat& imRGB, const cv::Mat &imGray, const cv::Mat &imDepth, const double &timeStamp,  ORBextractor* extractor, ORBVocabulary* voc,
              cv::Mat &K, cv::Mat &distCoef, const float &bf, const float &thDepth)
-    :mImMask(imMask), mpORBvocabulary(voc), mpORBextractorLeft(extractor), mpORBextractorRight(static_cast<ORBextractor*>(NULL)), mImGray(imGray),
-     mTimeStamp(timeStamp), mK(K.clone()),mDistCoef(distCoef.clone()), mbf(bf), mThDepth(thDepth), mIsKeyFrame(false), mImDepth(imDepth)
+    : mpORBvocabulary(voc)
+    , mpORBextractorLeft(extractor)
+    , mpORBextractorRight(static_cast<ORBextractor*>(NULL))
+    , mImGray(imGray)
+    , mTimeStamp(timeStamp)
+    , mK(K.clone())
+    , mDistCoef(distCoef.clone())
+    , mbf(bf)
+    , mThDepth(thDepth)
+    , mbIsKeyFrame(false)
+    , mImDepth(imDepth)
 {
+    // ========================== [Semantic] for semantic segmentation
+    mImRGB = imRGB;
+    mImDepth = imDepth;
+    mbIsKeyFrame = false;
+    mbIsTracked = false;
+
     // Frame ID
     mnId=nNextId++;
 
@@ -171,34 +189,8 @@ Frame::Frame(const cv::Mat &imGray, const cv::Mat &imDepth, const cv::Mat &imMas
     // ORB extraction
     ExtractORB(0,imGray);
 
-    // Delete those ORB points that fall in Mask borders (Included by Berta)
-    cv::Mat Mask_dil = imMask.clone();
-    int dilation_size = 15;
-    cv::Mat kernel = getStructuringElement(cv::MORPH_ELLIPSE,
-                                        cv::Size( 2*dilation_size + 1, 2*dilation_size+1 ),
-                                        cv::Point( dilation_size, dilation_size ) );
-    cv::erode(imMask, Mask_dil, kernel);
-
-    if(mvKeys.empty())
-        return;
-
-    std::vector<cv::KeyPoint> _mvKeys;
-    cv::Mat _mDescriptors;
-
-    for (size_t i(0); i < mvKeys.size(); ++i)
-    {
-        int val = (int)Mask_dil.at<uchar>(mvKeys[i].pt.y,mvKeys[i].pt.x);
-        if (val == 1)
-        {
-            _mvKeys.push_back(mvKeys[i]);
-            _mDescriptors.push_back(mDescriptors.row(i));
-        }
-    }
-
-    mvKeys = _mvKeys;
-    mDescriptors = _mDescriptors;
-
     N = mvKeys.size();
+    cout << "ly1: " << N << endl;
 
     if(mvKeys.empty())
         return;
@@ -210,88 +202,9 @@ Frame::Frame(const cv::Mat &imGray, const cv::Mat &imDepth, const cv::Mat &imMas
     mvpMapPoints = vector<MapPoint*>(N,static_cast<MapPoint*>(NULL));
     mvbOutlier = vector<bool>(N,false);
 
-    // This is done only for the first Frame (or after a change in the calibration)
-    if(mbInitialComputations)
-    {
-        ComputeImageBounds(imGray);
-
-        mfGridElementWidthInv=static_cast<float>(FRAME_GRID_COLS)/static_cast<float>(mnMaxX-mnMinX);
-        mfGridElementHeightInv=static_cast<float>(FRAME_GRID_ROWS)/static_cast<float>(mnMaxY-mnMinY);
-
-        fx = K.at<float>(0,0);
-        fy = K.at<float>(1,1);
-        cx = K.at<float>(0,2);
-        cy = K.at<float>(1,2);
-        invfx = 1.0f/fx;
-        invfy = 1.0f/fy;
-
-        mbInitialComputations=false;
-    }
-
-    mb = mbf/fx;
-
-    AssignFeaturesToGrid();
-}
-
-Frame::Frame(const cv::Mat &imGray, const cv::Mat &imDepth, const cv::Mat &imMask, const cv::Mat &imRGB,
-             const double &timeStamp,  ORBextractor* extractor, ORBVocabulary* voc,
-             cv::Mat &K, cv::Mat &distCoef, const float &bf, const float &thDepth)
-    :mImMask(imMask), mpORBvocabulary(voc), mpORBextractorLeft(extractor), mpORBextractorRight(static_cast<ORBextractor*>(NULL)), mImGray(imGray),
-     mTimeStamp(timeStamp), mK(K.clone()),mDistCoef(distCoef.clone()), mbf(bf), mThDepth(thDepth), mIsKeyFrame(false), mImDepth(imDepth), mImRGB(imRGB)
-{
-    // Frame ID
-    mnId=nNextId++;
-
-    // Scale Level Info
-    mnScaleLevels = mpORBextractorLeft->GetLevels();
-    mfScaleFactor = mpORBextractorLeft->GetScaleFactor();
-    mfLogScaleFactor = log(mfScaleFactor);
-    mvScaleFactors = mpORBextractorLeft->GetScaleFactors();
-    mvInvScaleFactors = mpORBextractorLeft->GetInverseScaleFactors();
-    mvLevelSigma2 = mpORBextractorLeft->GetScaleSigmaSquares();
-    mvInvLevelSigma2 = mpORBextractorLeft->GetInverseScaleSigmaSquares();
-
-    // ORB extraction
-    ExtractORB(0,imGray);
-
-    // Delete those ORB points that fall in Mask borders (Included by Berta)
-    cv::Mat Mask_dil = imMask.clone();
-    int dilation_size = 15;
-    cv::Mat kernel = getStructuringElement(cv::MORPH_ELLIPSE,
-                                        cv::Size( 2*dilation_size + 1, 2*dilation_size+1 ),
-                                        cv::Point( dilation_size, dilation_size ) );
-    cv::erode(imMask, Mask_dil, kernel);
-
-    if(mvKeys.empty())
-        return;
-
-    std::vector<cv::KeyPoint> _mvKeys;
-    cv::Mat _mDescriptors;
-
-    for (size_t i(0); i < mvKeys.size(); ++i)
-    {
-        int val = (int)Mask_dil.at<uchar>(mvKeys[i].pt.y,mvKeys[i].pt.x);
-        if (val == 1)
-        {
-            _mvKeys.push_back(mvKeys[i]);
-            _mDescriptors.push_back(mDescriptors.row(i));
-        }
-    }
-
-    mvKeys = _mvKeys;
-    mDescriptors = _mDescriptors;
-
-    N = mvKeys.size();
-
-    if(mvKeys.empty())
-        return;
-
-    UndistortKeyPoints();
-
-    ComputeStereoFromRGBD(imDepth);
-
-    mvpMapPoints = vector<MapPoint*>(N,static_cast<MapPoint*>(NULL));
-    mvbOutlier = vector<bool>(N,false);
+    // ===============================[Semantic ] indicate features whether are outliers
+    mvbKptOutliers = vector<bool>(N, false);
+    cout << "mvbKpt:" << mvbKptOutliers.size() << endl;
 
     // This is done only for the first Frame (or after a change in the calibration)
     if(mbInitialComputations)
@@ -850,6 +763,11 @@ cv::Mat Frame::UnprojectStereo(const int &i)
     }
     else
         return cv::Mat();
+}
+
+bool Frame::IsInImage(const float& x, const float& y) const
+{
+    return (x >= mnMinX && x < mnMaxX && y >= mnMinY && y < mnMaxY);
 }
 
 } //namespace ORB_SLAM

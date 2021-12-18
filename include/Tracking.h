@@ -14,19 +14,19 @@
 #include<opencv2/core/core.hpp>
 #include<opencv2/features2d/features2d.hpp>
 
-#include"Viewer.h"
-#include"FrameDrawer.h"
-#include"Map.h"
-#include"LocalMapping.h"
-#include"LoopClosing.h"
-#include"Frame.h"
+#include "Viewer.h"
+#include "FrameDrawer.h"
+#include "Map.h"
+#include "LocalMapping.h"
+#include "LoopClosing.h"
+#include "Frame.h"
 #include "ORBVocabulary.h"
-#include"KeyFrameDatabase.h"
-#include"ORBextractor.h"
+#include "KeyFrameDatabase.h"
+#include "ORBextractor.h"
 #include "Initializer.h"
 #include "MapDrawer.h"
 #include "System.h"
-#include "Geometry.h"
+//#include "Geometry.h"
 
 #include <mutex>
 
@@ -49,8 +49,11 @@ public:
 
     // Preprocess the input and call Track(). Extract features and performs stereo matching.
     cv::Mat GrabImageStereo(const cv::Mat &imRectLeft, const cv::Mat &imRectRight, const cv::Mat &maskLeft, const cv::Mat &maskRight, const double &timestamp);
-    cv::Mat GrabImageRGBD(const cv::Mat &imRGB, const cv::Mat &imD, cv::Mat &mask, const double &timestamp, cv::Mat &imRGBOut, cv::Mat &imDOut, cv::Mat &maskOut);
-    cv::Mat GrabImageRGBD(const cv::Mat &imRGB, const cv::Mat &imD, cv::Mat &mask, const double &timestamp);
+    
+    // ========================================semantic===========================
+    cv::Mat GrabImageRGBD(const cv::Mat &imRGB,const cv::Mat &imD, const double &timestamp);
+    //cv::Mat GrabImageRGBD(const cv::Mat &imRGB, const cv::Mat &imD, cv::Mat &mask, const double &timestamp, cv::Mat &imRGBOut, cv::Mat &imDOut, cv::Mat &maskOut);
+    //cv::Mat GrabImageRGBD(const cv::Mat &imRGB, const cv::Mat &imD, cv::Mat &mask, const double &timestamp);
     cv::Mat GrabImageMonocular(const cv::Mat &im, const cv::Mat &mask, const double &timestamp);
 
     void SetLocalMapper(LocalMapping* pLocalMapper);
@@ -65,6 +68,16 @@ public:
     // Use this function if you have deactivated local mapping and you only want to localize the camera.
     void InformOnlyTracking(const bool &flag);
 
+
+
+    //=================================semantic
+    // update local keyframes
+    void SemanticUpdateLocalKeyFrames(KeyFrame& currentKF);
+    std::vector<KeyFrame*> mvpSemanticLocalKeyFrames;
+    // update local points
+    void SemanticUpdateLocalPoints(KeyFrame& currentKF);
+    std::vector<MapPoint*> mvpSemanticLocalMapPoints;
+    // void SemanticSearchLocalPoints(KeyFrame& currentKF);
 
 public:
 
@@ -86,6 +99,24 @@ public:
     // Current Frame
     Frame mCurrentFrame;
     cv::Mat mImGray;
+
+    //=============================semantic=======================
+    //TODO save color iamge that used for semantic segmentation
+    cv::Mat mImRGB;
+    Frame* mpCurrentFrame;
+    // void SemanticTracking(Frame* lastFrame, Frame* currentFrame);
+
+    //==============================Semantic==============================
+    // void SemanticTracking(KeyFrame* lastKF, KeyFrame* currentFrame);
+    void PoseOptimization(KeyFrame* currentKF, bool bUpdateMap);
+    void SemanticBA(KeyFrame* currentKF);
+
+    void PredictFeatureProbability(KeyFrame* lastKF, KeyFrame* curKF);
+    // void PredictMovingProbability(KeyFrame* lastKF, Frame* curKF);
+    void PredictSemanticMask(KeyFrame* lastKF, KeyFrame* currentKF);
+
+
+
 
     // Initialization Variables (Monocular)
     std::vector<int> mvIniLastMatches;
@@ -181,6 +212,10 @@ protected:
 
     //Calibration matrix
     cv::Mat mK;
+    float fx;//============================
+    float fy;
+    float cx;
+    float cy;
     cv::Mat mDistCoef;
     float mbf;
 
@@ -213,8 +248,8 @@ protected:
 
     list<MapPoint*> mlpTemporalPoints;
 
-    //berta:
-    DynaSLAM::Geometry mGeometry;
+    //change berta:
+    //DynaSLAM::Geometry mGeometry;
 };
 
 } //namespace ORB_SLAM

@@ -28,6 +28,7 @@
 #include "Thirdparty/DBoW2/DBoW2/FeatureVector.h"
 
 #include<stdint-gcc.h>
+#include "Semantic.h"
 
 using namespace std;
 
@@ -44,9 +45,17 @@ ORBmatcher::ORBmatcher(float nnratio, bool checkOri): mfNNratio(nnratio), mbChec
 
 int ORBmatcher::SearchByProjection(Frame &F, const vector<MapPoint*> &vpMapPoints, const float th)
 {
+    //========================================
+    std::map<int, MapPoint*> goodMatchedPoints;
+    std::map<int, MapPoint*> initMatchedPoints;
+   
+   
     int nmatches=0;
 
     const bool bFactor = th!=1.0;
+
+    // ================= [semantic] Test
+    cv::Mat showFeature = F.mImRGB.clone();
 
     for(size_t iMP=0; iMP<vpMapPoints.size(); iMP++)
     {
@@ -56,6 +65,11 @@ int ORBmatcher::SearchByProjection(Frame &F, const vector<MapPoint*> &vpMapPoint
 
         if(pMP->isBad())
             continue;
+
+        // ====================[semanic] skip dynamic map points
+        // if (pMP->IsDynamicMapPoint())
+        //     continue;
+
 
         const int &nPredictedLevel = pMP->mnTrackScaleLevel;
 
@@ -115,15 +129,69 @@ int ORBmatcher::SearchByProjection(Frame &F, const vector<MapPoint*> &vpMapPoint
         }
 
         // Apply ratio to second match (only if best and second are in the same scale level)
+        //============================================================================
         if(bestDist<=TH_HIGH)
         {
             if(bestLevel==bestLevel2 && bestDist>mfNNratio*bestDist2)
+            {
+                // cv::Point uv(pMP->mTrackProjX, pMP->mTrackProjY);
+                cv::Point uv = F.mvKeys[bestIdx].pt;
+                F.mvbKptOutliers[bestIdx] = true;
+                cv::circle(showFeature, uv, 5, cv::Scalar(0, 0, 255), -1);
                 continue;
+            }
+            if (pMP->GetMovingProbability() == 0.5) 
+            {
+                initMatchedPoints.insert(std::pair<int, MapPoint*>(bestIdx, pMP));
+            }
+            if (pMP->GetMovingProbability() < 0.5)
+            {
+                F.mvbKptOutliers[bestIdx] = false;
+                // F.mvpMapPoints[bestIdx] = pMP;
+                goodMatchedPoints.insert(std::pair<int, MapPoint*>(bestIdx, pMP));
+            }
+        
 
-            F.mvpMapPoints[bestIdx]=pMP;
+            //F.mvpMapPoints[bestIdx]=pMP;
             nmatches++;
         }
     }
+
+    //================================================================
+    int nSizeGoodMapPoints = goodMatchedPoints.size();
+    int nSizeInitMapPoints = initMatchedPoints.size();
+
+    for (auto it = goodMatchedPoints.begin(); it != goodMatchedPoints.end(); it++) {
+        MapPoint* pMP = it->second;
+        F.mvpMapPoints[it->first] = pMP;
+        // cv::Point uv(pMP->mTrackProjX, pMP->mTrackProjY);
+        cv::Point uv = F.mvKeys[it->first].pt;
+        cv::circle(showFeature, uv, 5, cv::Scalar(255, 0, 0), -1);
+    }
+    nmatches = nSizeGoodMapPoints;
+    LOG(INFO) << "Num of matched: " << nmatches;
+
+    if (nSizeGoodMapPoints < 30) {
+        for (auto it = initMatchedPoints.begin(); it != initMatchedPoints.end(); it++) {
+            MapPoint* pMP = it->second;
+            F.mvpMapPoints[it->first] = pMP;
+            // cv::Point uv(pMP->mTrackProjX, pMP->mTrackProjY);
+            cv::Point uv = F.mvKeys[it->first].pt;
+            cv::circle(showFeature, uv, 5, cv::Scalar(0, 255, 0), -1);
+        }
+
+        nmatches = nSizeGoodMapPoints + nSizeInitMapPoints;
+    }
+    LOG(INFO) << "Total Num of matched: " << nmatches;
+
+    // TODO save matched features
+    Config::GetInstance()->saveImage(showFeature, "debug", "map_" + std::to_string(F.mnId) + ".png");
+
+    // if (!showFeature.empty() && showFeature.data) {
+    //     cv::namedWindow("Semantic_map");
+    //     cv::imshow("Semantic_map", showFeature);
+    //     cv::waitKey(1);
+    // }
 
     return nmatches;
 }
@@ -316,6 +384,11 @@ int ORBmatcher::SearchByProjection(KeyFrame* pKF, cv::Mat Scw, const vector<MapP
         // Discard Bad MapPoints and already found
         if(pMP->isBad() || spAlreadyFound.count(pMP))
             continue;
+
+        // =========================[semanic] skip dynamic map points
+        if (Semantic::GetInstance()->IsDynamicMapPoint(pMP)) {
+            continue;
+        }
 
         // Get 3D Coords.
         cv::Mat p3Dw = pMP->GetWorldPos();
@@ -1325,8 +1398,12 @@ int ORBmatcher::SearchBySim3(KeyFrame *pKF1, KeyFrame *pKF2, vector<MapPoint*> &
     return nFound;
 }
 
-int ORBmatcher::SearchByProjection(Frame &CurrentFrame, const Frame &LastFrame, const float th, const bool bMono)
+int ORBmatcher::SearchByProjection(Frame &CurrentFrame, Frame &LastFrame, const float th, const bool bMono)
 {
+    //===================
+    std::map<int, MapPoint*> goodMatchedPoints;
+    std::map<int, MapPoint*> initMatchedPoints;
+
     int nmatches = 0;
 
     // Rotation Histogram (to check rotation consistency)
@@ -1334,6 +1411,7 @@ int ORBmatcher::SearchByProjection(Frame &CurrentFrame, const Frame &LastFrame, 
     for(int i=0;i<HISTO_LENGTH;i++)
         rotHist[i].reserve(500);
     const float factor = 1.0f/HISTO_LENGTH;
+    //const float factor = HISTO_LENGTH / 360.0f;
 
     const cv::Mat Rcw = CurrentFrame.mTcw.rowRange(0,3).colRange(0,3);
     const cv::Mat tcw = CurrentFrame.mTcw.rowRange(0,3).col(3);
@@ -1348,14 +1426,22 @@ int ORBmatcher::SearchByProjection(Frame &CurrentFrame, const Frame &LastFrame, 
     const bool bForward = tlc.at<float>(2)>CurrentFrame.mb && !bMono;
     const bool bBackward = -tlc.at<float>(2)>CurrentFrame.mb && !bMono;
 
+    // ======================TODO Test:
+    cv::Mat showFeature = CurrentFrame.mImRGB.clone();
+
     for(int i=0; i<LastFrame.N; i++)
     {
         MapPoint* pMP = LastFrame.mvpMapPoints[i];
-
         if(pMP)
         {
-            if(!LastFrame.mvbOutlier[i])
+            cout <<  LastFrame.mvbKptOutliers.size() << endl;
+            cout << "lyi: " << i << endl;
+            cout << "ly1: " << LastFrame.mvbOutlier[i]<< endl;
+            cout << "ly2: " << LastFrame.mvbKptOutliers[i] << endl;
+            
+            if(!LastFrame.mvbOutlier[i] && !LastFrame.mvbKptOutliers[i])//======
             {
+                
                 // Project
                 cv::Mat x3Dw = pMP->GetWorldPos();
                 cv::Mat x3Dc = Rcw*x3Dw+tcw;
@@ -1424,9 +1510,33 @@ int ORBmatcher::SearchByProjection(Frame &CurrentFrame, const Frame &LastFrame, 
                 }
 
                 if(bestDist<=TH_HIGH)
+                    // CurrentFrame.mvpMapPoints[bestIdx2] = pMP;
+
+                    //=======================[semanic] skip dynamic map points
                 {
-                    CurrentFrame.mvpMapPoints[bestIdx2]=pMP;
+                    if (pMP->mMovingProbability > 0.5) {
+                        // LastFrame.mvbOutlier[i] = true;
+                        // cv::circle(showFeature, uv, 2, cv::Scalar(0, 0, 255), -1);
+                        cv::Point uv2 = CurrentFrame.mvKeys[bestIdx2].pt;
+                        // cv::Point uv2(pMP->mTrackProjX, pMP->mTrackProjY);
+
+                        CurrentFrame.mvbOutlier[bestIdx2] = true;
+                        cv::circle(showFeature, uv2, 5, cv::Scalar(0, 0, 255), -1);
+                        continue;
+                    }
+
+
+                    //CurrentFrame.mvpMapPoints[bestIdx2]=pMP;
                     nmatches++;
+
+                    //===========================================================
+                    if (pMP->mMovingProbability < 0.5) {
+                        CurrentFrame.mvbOutlier[bestIdx2] = false;
+                        goodMatchedPoints.insert(std::pair<int, MapPoint*>(bestIdx2, pMP));
+                    }
+                    if (pMP->mMovingProbability == 0.5) {
+                        initMatchedPoints.insert(std::pair<int, MapPoint*>(bestIdx2, pMP));
+                    }
 
                     if(mbCheckOrientation)
                     {
@@ -1465,6 +1575,40 @@ int ORBmatcher::SearchByProjection(Frame &CurrentFrame, const Frame &LastFrame, 
             }
         }
     }
+    //========================================================================
+    int nSizeGoodMapPoints = goodMatchedPoints.size();
+    int nSizeInitMapPoints = initMatchedPoints.size();
+
+    for (auto it = goodMatchedPoints.begin(); it != goodMatchedPoints.end(); it++) {
+        MapPoint* pMP = it->second;
+        CurrentFrame.mvpMapPoints[it->first] = pMP;
+        cv::Point uv2 = CurrentFrame.mvKeys[it->first].pt;
+        cv::circle(showFeature, uv2, 5, cv::Scalar(255, 0, 0), -1);
+    }
+    nmatches = nSizeGoodMapPoints;
+    LOG(INFO) << "Num of matched: " << nmatches;
+
+    if (nSizeGoodMapPoints < 30) {
+        for (auto it = initMatchedPoints.begin(); it != initMatchedPoints.end(); it++) {
+            MapPoint* pMP = it->second;
+            CurrentFrame.mvpMapPoints[it->first] = pMP;
+            cv::Point uv2 = CurrentFrame.mvKeys[it->first].pt;
+            cv::circle(showFeature, uv2, 5, cv::Scalar(0, 255, 0), -1);
+        }
+
+        nmatches = nSizeGoodMapPoints + nSizeInitMapPoints;
+    }
+    LOG(INFO) << "Total Num of matched: " << nmatches;
+
+    // TODO save matched features
+    Config::GetInstance()->saveImage(showFeature, "debug", "motion_" + std::to_string(CurrentFrame.mnId) + ".png");
+
+   // if (!showFeature.empty() && showFeature.data) {
+   //      cv::namedWindow("Semantic_motion");
+   //      cv::imshow("Semantic_motion", showFeature);
+   //      cv::waitKey(1);
+   // }
+  
 
     return nmatches;
 }
@@ -1481,6 +1625,9 @@ int ORBmatcher::SearchByProjection(Frame &CurrentFrame, KeyFrame *pKF, const set
     vector<int> rotHist[HISTO_LENGTH];
     for(int i=0;i<HISTO_LENGTH;i++)
         rotHist[i].reserve(500);
+
+    //! 原作者代码是 const float factor = 1.0f/HISTO_LENGTH; 是错误的，更改为下面代码
+    // const float factor = HISTO_LENGTH / 360.0f;
     const float factor = 1.0f/HISTO_LENGTH;
 
     const vector<MapPoint*> vpMPs = pKF->GetMapPointMatches();
@@ -1491,6 +1638,11 @@ int ORBmatcher::SearchByProjection(Frame &CurrentFrame, KeyFrame *pKF, const set
 
         if(pMP)
         {
+            //===============================[semanic] skip dynamic map points
+            if (pMP->IsDynamicMapPoint()) {
+                continue;
+            }
+
             if(!pMP->isBad() && !sAlreadyFound.count(pMP))
             {
                 //Project
@@ -1661,5 +1813,143 @@ int ORBmatcher::DescriptorDistance(const cv::Mat &a, const cv::Mat &b)
 
     return dist;
 }
+
+//==========================================================
+int ORBmatcher::SearchByProjection(KeyFrame& CurrentFrame, KeyFrame& LastFrame, const float th, const bool bMono)
+{
+    int nmatches = 0;
+
+    // Rotation Histogram (to check rotation consistency)
+    vector<int> rotHist[HISTO_LENGTH];
+    for (int i = 0; i < HISTO_LENGTH; i++)
+        rotHist[i].reserve(500);
+
+    const float factor = 1.0f / HISTO_LENGTH;
+    //const float factor = HISTO_LENGTH / 360.0f;
+
+    const cv::Mat Rcw = CurrentFrame.GetPose().rowRange(0, 3).colRange(0, 3);
+    const cv::Mat tcw = CurrentFrame.GetPose().rowRange(0, 3).col(3);
+
+    const cv::Mat twc = -Rcw.t() * tcw;
+
+    const cv::Mat Rlw = LastFrame.GetPose().rowRange(0, 3).colRange(0, 3);
+    const cv::Mat tlw = LastFrame.GetPose().rowRange(0, 3).col(3);
+
+    const cv::Mat tlc = Rlw * twc + tlw;
+
+    const bool bForward = tlc.at<float>(2) > CurrentFrame.mb && !bMono;
+    const bool bBackward = -tlc.at<float>(2) > CurrentFrame.mb && !bMono;
+
+    // ===============TODO Test:
+    // cv::Mat showFeature = CurrentFrame.mImRGB.clone();
+    for (int i = 0; i < LastFrame.N; i++) {
+        MapPoint* pMP = LastFrame.mvpMapPoints[i];
+        if (pMP) {
+            if (!LastFrame.mvbOutlier[i]) {
+                // Project
+                cv::Mat x3Dw = pMP->GetWorldPos();
+                cv::Mat x3Dc = Rcw * x3Dw + tcw;
+
+                const float xc = x3Dc.at<float>(0);
+                const float yc = x3Dc.at<float>(1);
+                const float invzc = 1.0/x3Dc.at<float>(2);
+
+                if(invzc<0)
+                    continue;
+
+                const float u = CurrentFrame.fx*xc*invzc+CurrentFrame.cx;
+                const float v = CurrentFrame.fy*yc*invzc+CurrentFrame.cy;
+
+                if(u<CurrentFrame.mnMinX || u>CurrentFrame.mnMaxX)
+                    continue;
+                if(v<CurrentFrame.mnMinY || v>CurrentFrame.mnMaxY)
+                    continue;
+
+                cv::Mat PO = x3Dw - twc;
+                float dist3D = cv::norm(PO);
+
+                // ==========================[semanic] skip dynamic map points
+                if (pMP->IsDynamicMapPoint()) {
+                    // LastFrame.mvbOutlier[i] = true;
+                    // cv::circle(showFeature, uv, 2, cv::Scalar(0, 0, 255), -1);
+                    continue;
+                }
+                // Search in a window. Size depends on scale
+                int nPredictedLevel = pMP->PredictScale(dist3D, &CurrentFrame);
+                // float radius = th * CurrentFrame.mvScaleFactors[nLastOctave];
+                const float radius = th * CurrentFrame.mvScaleFactors[nPredictedLevel];
+                vector<size_t> vIndices2;
+
+                vIndices2 = CurrentFrame.GetFeaturesInArea(u, v, radius);
+
+                if (vIndices2.empty())
+                    continue;
+
+                const cv::Mat dMP = pMP->GetDescriptor();
+
+                int bestDist = 256;
+                int bestIdx2 = -1;
+
+                for (vector<size_t>::const_iterator vit = vIndices2.begin(), vend = vIndices2.end(); vit != vend; vit++) {
+                    const size_t i2 = *vit;
+
+                    if (CurrentFrame.mvpMapPoints[i2])
+                        if (CurrentFrame.mvpMapPoints[i2]->Observations() > 0)
+                            continue;
+
+                    const cv::Mat& d = CurrentFrame.mDescriptors.row(i2);
+
+                    const int dist = DescriptorDistance(dMP, d);
+
+                    if (dist < bestDist) {
+                        bestDist = dist;
+                        bestIdx2 = i2;
+                    }
+                }
+
+                if (bestDist <= TH_HIGH) {
+                    CurrentFrame.mvpMapPoints[bestIdx2] = pMP;
+                    nmatches++;
+
+                    if (mbCheckOrientation) {
+                        cv::KeyPoint kpLF = LastFrame.mvKeysUn[i];
+                        cv::KeyPoint kpCF = CurrentFrame.mvKeysUn[bestIdx2];
+                        float rot = kpLF.angle - kpCF.angle;
+                        if (rot < 0.0)
+                            rot += 360.0f;
+                        int bin = round(rot * factor);
+                        if (bin == HISTO_LENGTH)
+                            bin = 0;
+                        assert(bin >= 0 && bin < HISTO_LENGTH);
+                        rotHist[bin].push_back(bestIdx2);
+                    }
+                }
+            }
+        }
+    }
+
+    //Apply rotation consistency
+    if (mbCheckOrientation) {
+        int ind1 = -1;
+        int ind2 = -1;
+        int ind3 = -1;
+
+        ComputeThreeMaxima(rotHist, HISTO_LENGTH, ind1, ind2, ind3);
+
+        for (int i = 0; i < HISTO_LENGTH; i++) {
+            if (i != ind1 && i != ind2 && i != ind3) {
+                for (size_t j = 0, jend = rotHist[i].size(); j < jend; j++) {
+                    CurrentFrame.mvpMapPoints[rotHist[i][j]] = static_cast<MapPoint*>(NULL);
+                    nmatches--;
+                }
+            }
+        }
+    }
+
+    // TODO save matched features
+    // Config::GetInstance()->saveImage(showFeature, "debug", "project_" + std::to_string(CurrentFrame.mnId) + ".png");
+    return nmatches;
+}
+
 
 } //namespace ORB_SLAM

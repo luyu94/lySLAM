@@ -39,6 +39,7 @@ class Map
 {
 public:
     Map();
+    Map(int initKFid);
 
     void AddKeyFrame(KeyFrame* pKF);
     void AddMapPoint(MapPoint* pMP);
@@ -51,6 +52,16 @@ public:
     std::vector<KeyFrame*> GetAllKeyFrames();
     std::vector<MapPoint*> GetAllMapPoints();
     std::vector<MapPoint*> GetReferenceMapPoints();
+
+    //=====================
+    long unsigned int GetId();
+    void CreateNewMap();
+    Map* GetCurrentMap();
+    void SetCurrentMap();
+    void SetStoredMap();
+    bool IsBad();
+    long unsigned int GetInitKFid();
+    bool IsInertial();
 
     long unsigned int MapPointsInMap();
     long unsigned  KeyFramesInMap();
@@ -66,16 +77,34 @@ public:
     // This avoid that two points are created simultaneously in separate threads (id conflict)
     std::mutex mMutexPointCreation;
 
+    //=================
+    static long unsigned int nNextId;
+
 protected:
+    //==============
+    long unsigned int mnId;
+    std::set<Map*> mspMaps;
+    unsigned long int mnLastInitKFidMap;
+
     std::set<MapPoint*> mspMapPoints;
     std::set<KeyFrame*> mspKeyFrames;
 
     std::vector<MapPoint*> mvpReferenceMapPoints;
 
+    //================
+    Map* mpCurrentMap;
+    long unsigned int mnInitKFid;
+  
     long unsigned int mnMaxKFid;
 
     // Index related to a big change in the map (loop closure, global BA)
     int mnBigChangeIdx;
+
+
+    //==============
+    bool mIsInUse;
+    bool mbBad = false;
+    bool mbIsInertial;
 
     std::mutex mMutexMap;
 };
