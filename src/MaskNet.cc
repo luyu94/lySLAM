@@ -15,7 +15,7 @@
 
 using namespace std;
 
-namespace DynaSLAM
+namespace lySLAM
 {
 
 #define U_SEGSt(a)\

@@ -111,9 +111,9 @@ void Semantic::SemanticSegmentationThread()
     LOG(INFO) << "==========Start Semantic Segmentation thread==========";
 
     // Initialize Mask R-CNN
-    DynaSLAM::SegmentDynObject *MaskNet;
+    lySLAM::SegmentDynObject *MaskNet;
     cout << "Loading Mask R-CNN. This could take a while..." << endl;
-    MaskNet = new DynaSLAM::SegmentDynObject();     //创建语义分割函数对象
+    MaskNet = new lySLAM::SegmentDynObject();     //创建语义分割函数对象
     cout << "Mask R-CNN loaded!" << endl;
 
     std::this_thread::sleep_for(std::chrono::milliseconds(100));

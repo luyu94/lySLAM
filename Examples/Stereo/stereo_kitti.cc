@@ -42,9 +42,9 @@ int main(int argc, char **argv)
 
     // Initialize Mask R-CNN
     cout << "Loading Mask R-CNN. This could take a while..." << endl;
-    DynaSLAM::SegmentDynObject *MaskNet;
+    lySLAM::SegmentDynObject *MaskNet;
     if (argc==5){
-         MaskNet = new DynaSLAM::SegmentDynObject();
+         MaskNet = new lySLAM::SegmentDynObject();
     }
     cout << "Mask net loaded!" << endl;
 

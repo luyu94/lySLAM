@@ -18,7 +18,7 @@
 #include <boost/thread.hpp>
 #include "include/Conversion.h"
 
-namespace DynaSLAM
+namespace lySLAM
 {
 
 class SegmentDynObjectStereo{

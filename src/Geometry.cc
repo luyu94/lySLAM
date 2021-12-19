@@ -10,7 +10,7 @@
 #include "Frame.h"
 #include "Tracking.h"
 
-namespace DynaSLAM
+namespace lySLAM
 {
 
 Geometry::Geometry()

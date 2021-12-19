@@ -18,7 +18,7 @@ print ('Initializing Mask RCNN network...')
 # Root directory of the project
 ROOT_DIR = os.getcwd()
 print(ROOT_DIR)
-ROOT_DIR = "/mnt/DynaSLAM/src/python"
+ROOT_DIR = "/mnt/lySLAM/src/python"
 print(ROOT_DIR)
 
 # Directory to save logs and trained model

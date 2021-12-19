@@ -31,7 +31,7 @@ void LoadImages(const string &strAssociationFilename, vector<string> &vstrImageF
 
 int main(int argc, char *argv[])
 {
-    //FLAGS_log_dir = "/mnt/DynaSLAM/GLOG";
+    //FLAGS_log_dir = "/mnt/lySLAM/GLOG";
     google::InitGoogleLogging(argv[0]);
 
     if(argc < 5 )

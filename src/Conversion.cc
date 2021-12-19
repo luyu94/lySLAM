@@ -10,7 +10,7 @@
 
 
 
-namespace DynaSLAM
+namespace lySLAM
 {
 
 static void init()

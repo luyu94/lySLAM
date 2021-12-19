@@ -20,7 +20,7 @@
 
 #define import_array() NUMPY_IMPORT_ARRAY_RETVAL
 
-namespace DynaSLAM
+namespace lySLAM
 {
 
 static PyObject* opencv_error = 0;

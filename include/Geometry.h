@@ -21,7 +21,7 @@
 #define ELEM_INITIAL_MAP 5
 #define MIN_DEPTH_THRESHOLD 0.2
 
-namespace DynaSLAM
+namespace lySLAM
 {
 
 class Geometry

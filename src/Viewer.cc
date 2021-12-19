@@ -45,7 +45,7 @@ void Viewer::Run()
     mbFinished = false;
     mbStopped = false;
 
-    pangolin::CreateWindowAndBind("DynaSLAM: Map Viewer",1024,768);
+    pangolin::CreateWindowAndBind("lySLAM: Map Viewer",1024,768);
 
     // 3D Mouse handler requires depth testing to be enabled
     glEnable(GL_DEPTH_TEST);
@@ -124,7 +124,7 @@ void Viewer::Run()
         pangolin::FinishFrame();
 
         cv::Mat im = mpFrameDrawer->DrawFrame();
-        // cv::imshow("DynaSLAM: Current Frame",im);
+        // cv::imshow("lySLAM: Current Frame",im);
         // cv::waitKey(mT);
 
         if(menuReset)

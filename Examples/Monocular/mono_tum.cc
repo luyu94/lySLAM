@@ -41,11 +41,11 @@ int main(int argc, char **argv)
     int nImages = vstrImageFilenames.size();
 
     // Initialize Mask R-CNN
-    DynaSLAM::SegmentDynObject* MaskNet;
+    lySLAM::SegmentDynObject* MaskNet;
     if (argc==5)
     {
         cout << "Loading Mask R-CNN. This could take a while..." << endl;
-        MaskNet = new DynaSLAM::SegmentDynObject();
+        MaskNet = new lySLAM::SegmentDynObject();
         cout << "Mask R-CNN loaded!" << endl;
     }
 

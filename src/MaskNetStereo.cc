@@ -3,7 +3,7 @@
 #include <fstream>
 #include <iomanip>
 
-namespace DynaSLAM
+namespace lySLAM
 {
 
 //#define U_SEGSt(a)\

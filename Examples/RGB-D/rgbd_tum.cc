@@ -55,11 +55,11 @@ int main(int argc, char **argv)
     }
 
     // Initialize Mask R-CNN
-    DynaSLAM::SegmentDynObject *MaskNet;
+    lySLAM::SegmentDynObject *MaskNet;
     if (argc==6 || argc==7)
     {
         cout << "Loading Mask R-CNN. This could take a while..." << endl;
-        MaskNet = new DynaSLAM::SegmentDynObject();     //创建函数对象，得到每一帧的分割结果
+        MaskNet = new lySLAM::SegmentDynObject();     //创建函数对象，得到每一帧的分割结果
         cout << "Mask R-CNN loaded!" << endl;
     }
 
