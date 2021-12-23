@@ -19,8 +19,9 @@ public:
 
     // note: threads related
     void Run();
-    void SemanticTrackingThread();  //语义跟踪线程
     void SemanticSegmentationThread();  //语义分割线程
+    void SemanticTrackingThread();  //语义跟踪线程
+    //void SemanticSegmentationThread();  //语义分割线程
     void SemanticBAThread();
     void RequestFinish();
 
@@ -40,7 +41,9 @@ public:
     // To evaluate the time delay between sequential model and bi-direction model
     std::vector<size_t> mvSemanticDelay;
 
-    // void FinalStage();
+ 
+
+    void FinalStage();
     ~Semantic();
 
 

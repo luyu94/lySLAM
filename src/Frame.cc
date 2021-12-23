@@ -28,17 +28,46 @@ Frame::Frame()
 
 //Copy Constructor
 Frame::Frame(const Frame &frame)
-    :mpORBvocabulary(frame.mpORBvocabulary), mpORBextractorLeft(frame.mpORBextractorLeft), mpORBextractorRight(frame.mpORBextractorRight),
-     mTimeStamp(frame.mTimeStamp), mK(frame.mK.clone()), mDistCoef(frame.mDistCoef.clone()),
-     mbf(frame.mbf), mb(frame.mb), mThDepth(frame.mThDepth), N(frame.N), mvKeys(frame.mvKeys),
-     mvKeysRight(frame.mvKeysRight), mvKeysUn(frame.mvKeysUn),  mvuRight(frame.mvuRight),
-     mvDepth(frame.mvDepth), mBowVec(frame.mBowVec), mFeatVec(frame.mFeatVec),
-     mDescriptors(frame.mDescriptors.clone()), mDescriptorsRight(frame.mDescriptorsRight.clone()),
-     mvpMapPoints(frame.mvpMapPoints), mvbOutlier(frame.mvbOutlier), mnId(frame.mnId),
-     mpReferenceKF(frame.mpReferenceKF), mnScaleLevels(frame.mnScaleLevels), mImRGB(frame.mImRGB),
-     mfScaleFactor(frame.mfScaleFactor), mfLogScaleFactor(frame.mfLogScaleFactor), mImGray(frame.mImGray),
-     mvScaleFactors(frame.mvScaleFactors), mvInvScaleFactors(frame.mvInvScaleFactors),mImMask(frame.mImMask),
-     mvLevelSigma2(frame.mvLevelSigma2), mvInvLevelSigma2(frame.mvInvLevelSigma2),mbIsKeyFrame(frame.mbIsKeyFrame),mImDepth(frame.mImDepth)
+    : mpORBvocabulary(frame.mpORBvocabulary)
+    , mpORBextractorLeft(frame.mpORBextractorLeft)
+    , mpORBextractorRight(frame.mpORBextractorRight)
+    , mTimeStamp(frame.mTimeStamp)
+    , mK(frame.mK.clone())
+    , mDistCoef(frame.mDistCoef.clone())
+    , mbf(frame.mbf)
+    , mb(frame.mb)
+    , mThDepth(frame.mThDepth)
+    , N(frame.N)
+    , mvKeys(frame.mvKeys)
+    , mvKeysRight(frame.mvKeysRight)
+    , mvKeysUn(frame.mvKeysUn)
+    , mvuRight(frame.mvuRight)
+    , mvDepth(frame.mvDepth)
+    , mBowVec(frame.mBowVec)
+    , mFeatVec(frame.mFeatVec)
+    , mDescriptors(frame.mDescriptors.clone())
+    , mDescriptorsRight(frame.mDescriptorsRight.clone())
+    , mvpMapPoints(frame.mvpMapPoints)
+    , mvbOutlier(frame.mvbOutlier)
+    , mnId(frame.mnId)
+    , mpReferenceKF(frame.mpReferenceKF)
+    , mnScaleLevels(frame.mnScaleLevels)
+    , mfScaleFactor(frame.mfScaleFactor)
+    , mfLogScaleFactor(frame.mfLogScaleFactor)
+    , mImGray(frame.mImGray)  //
+    , mvScaleFactors(frame.mvScaleFactors)
+    , mvInvScaleFactors(frame.mvInvScaleFactors)
+    , mvLevelSigma2(frame.mvLevelSigma2)
+    , mvInvLevelSigma2(frame.mvInvLevelSigma2)
+    // , mTimeStereoMatch(frame.mTimeStereoMatch)  //
+    // , mTimeORB_Ext(frame.mTimeORB_Ext)  //
+    , mImDepth(frame.mImDepth)  //
+    , mImRGB(frame.mImRGB)  // add
+    , mbIsKeyFrame(frame.mbIsKeyFrame)  //
+    , mbIsTracked(frame.mbIsTracked)    //
+    , mvbKptOutliers(frame.mvbKptOutliers)  //
+
+
 {
     for(int i=0;i<FRAME_GRID_COLS;i++)
         for(int j=0; j<FRAME_GRID_ROWS; j++)
@@ -190,7 +219,7 @@ Frame::Frame(const cv::Mat& imRGB, const cv::Mat &imGray, const cv::Mat &imDepth
     ExtractORB(0,imGray);
 
     N = mvKeys.size();
-    cout << "ly1: " << N << endl;
+    // LOG(INFO) << "------mvKeys: " << N;
 
     if(mvKeys.empty())
         return;
@@ -204,7 +233,7 @@ Frame::Frame(const cv::Mat& imRGB, const cv::Mat &imGray, const cv::Mat &imDepth
 
     // ===============================[Semantic ] indicate features whether are outliers
     mvbKptOutliers = vector<bool>(N, false);
-    cout << "mvbKpt:" << mvbKptOutliers.size() << endl;
+    // LOG(INFO) << "------mvbKptOutliers.size:" << mvbKptOutliers.size();
 
     // This is done only for the first Frame (or after a change in the calibration)
     if(mbInitialComputations)

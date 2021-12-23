@@ -38,6 +38,10 @@ class ORBmatcher
 {    
 public:
 
+    /**
+     * @param nnratio: 比例
+     * @param checkOri: 是否进行方向一致性检测
+     */
     ORBmatcher(float nnratio=0.6, bool checkOri=true);
 
     // Computes the Hamming distance between two ORB descriptors
@@ -45,21 +49,50 @@ public:
 
     // Search matches between Frame keypoints and projected MapPoints. Returns number of matches
     // Used to track the local map (Tracking)
+    /**
+     * @brief 用来跟踪局部地图
+     * 主要利用MapPoint的描述子和Frame的特征点描述子进行匹配
+     * @param F : 跟踪关键帧
+     * @param vpMapPoints: 局部地图点
+     * @param th: 阈值,决定搜索窗口大小
+     */
     int SearchByProjection(Frame &F, const std::vector<MapPoint*> &vpMapPoints, const float th=3);
 
     // Project MapPoints tracked in last frame into the current frame and search matches.
     // Used to track from previous frame (Tracking)
+    /**
+     * @brief 用来跟踪tracking
+     * 从LastFrame的MapPoints中找到与CurrentFram匹配的MapPoints，增补CurrentFrame的MapPoints
+     * @param th: 阈值,决定搜索窗口大小
+     */
+    // 1.project last frame's 3D map point to current frame
+    // 2.compute the current frame's keypoints descriptor's Haming distance to the map points
+    // 3.find the closest map point in current frame
     int SearchByProjection(Frame &CurrentFrame, Frame &LastFrame, const float th, const bool bMono);
 
+
     //=========================[Semantic] Remove const label for LastFrame=============
+    /**
+     * @brief 用来跟踪局部地图
+     * 主要利用MapPoint的描述子和Frame的特征点描述子进行匹配
+     * @param F : 跟踪关键帧
+     * @param vpMapPoints: 局部地图点
+     * @param th: 阈值,决定搜索窗口大小
+     */
     int SearchByProjection(KeyFrame& CurrentFrame, KeyFrame& LastFrame, const float th, const bool bMono);
 
     // Project MapPoints seen in KeyFrame into the Frame and search matches.
     // Used in relocalisation (Tracking)
+    /**
+     * @brief 将关键帧的MapPoint投影到CurrentFrame,然后寻找匹配关系
+     */
     int SearchByProjection(Frame &CurrentFrame, KeyFrame* pKF, const std::set<MapPoint*> &sAlreadyFound, const float th, const int ORBdist);
 
     // Project MapPoints using a Similarity Transformation and search matches.
     // Used in loop detection (Loop Closing)
+    /**
+     * @brief 通过相似变换Scw将vpPoints投影到pKF,通过计算描述子距离寻找匹配关系
+     */
      int SearchByProjection(KeyFrame* pKF, cv::Mat Scw, const std::vector<MapPoint*> &vpPoints, std::vector<MapPoint*> &vpMatched, int th);
 
     // Search matches between MapPoints in a KeyFrame and ORB in a Frame.
@@ -98,6 +131,9 @@ protected:
 
     float RadiusByViewingCos(const float &viewCos);
 
+    /**
+     * 在直方图中找到三个最大值,并返回它们的索引
+     */
     void ComputeThreeMaxima(std::vector<int>* histo, const int L, int &ind1, int &ind2, int &ind3);
 
     float mfNNratio;

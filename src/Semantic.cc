@@ -13,6 +13,37 @@
 using namespace std;
 namespace ORB_SLAM2 {
 
+//各参数
+Semantic::Semantic()
+{
+    //msCnnMethod = "segnet"; // or "maskrcnn"
+    mnLatestSemanticKeyFrameID = 0;
+    mnTotalSemanticFrameNum = 0;
+
+    // statistics
+    // Resrve space of total frame number int TUM dataset
+    mvTimeUpdateMovingProbability.reserve(1000);
+    mvTimeMaskGeneration.reserve(1000);
+    mvTimeSemanticOptimization.reserve(1000);
+
+    mBatchSize = 2;
+    mbFinishRequested = false;
+
+    // Morphological filter
+    mDilation_size = 15;
+    mKernel = getStructuringElement(cv::MORPH_ELLIPSE,
+        cv::Size(2 * mDilation_size + 1, 2 * mDilation_size + 1),
+        cv::Point(mDilation_size, mDilation_size));
+
+    // threshold for moving probablility of map points
+    mthDynamicThreshold = 0.5;
+    // segment the first few frames
+    mnSegmentFrameNum = 1;
+    mbIsUseSemantic = true;
+    // Start a semantic tracing thread
+    LOG(INFO) << "======Create Semantic instance and start new thread";
+}
+
 void Semantic::Run()
 {
     mptSemanticSegmentation = new std::thread(&Semantic::SemanticSegmentationThread, this);
@@ -32,7 +63,7 @@ void Semantic::SemanticTrackingThread()
     bool bSkip = false;
     int frameCount = -1;
     int lastSegID = -1;
-    LOG(INFO) << "=================Start Semantic tracking thread=============";
+    LOG(INFO) << "========Start Semantic tracking thread=======";
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     while (1) 
     {
@@ -50,18 +81,18 @@ void Semantic::SemanticTrackingThread()
         } // Is process request comming?
 
         // Main loop, new request came
-        LOG(INFO) << "Size of semantic optimization queue: " << mlSemanticTrack.size();
-        std::cout << "Size of semantic opotimization queue: " << mlSemanticTrack.size() << std::endl;
+        //LOG(INFO) << "------Size of semantic optimization queue mlSemanticTrack.size()  " << mlSemanticTrack.size();
+        std::cout << "----------Size of semantic optimization queue: " << mlSemanticTrack.size() << std::endl;
+        //LOG(INFO) << "------";
+        //std::cout << "----------Semantic tracker:" << currentKF->mnId << std::endl;
+        //LOG(INFO) << "------Semantic tracker currentKF mnId  " << currentKF->mnId;
 
-        // std::cout << "------------------Semantic tracker:" << currentKF->mnId << "-------------------------" << std::endl;
-        // LOG(INFO) << "------------------Semantic tracker:" << currentKF->mnId << "-------------------------";
-
-        // 发出跟踪请求send request, get semantic label, mLabel
+        // 发出跟踪请求 send request, get semantic label, mLabel
         std::unique_lock<std::mutex> lock(mMutexSemanticTrack);
         currentKF = mlSemanticTrack.front();
         mlSemanticTrack.pop_front();
         if (!currentKF) {
-            LOG(WARNING) << "Null key fame";
+            cout << "Null keyframe" << endl;
             lock.unlock();
             continue;
         }
@@ -70,10 +101,12 @@ void Semantic::SemanticTrackingThread()
 
         // 如果当前关键帧的ID大于2？？？
         if (currentKF->mnId > 2) {
-            std::cout << "Optimize KF: " << currentKF->mnId << std::endl;
+            //std::cout << "Optimize KF: " << currentKF->mnId << std::endl;
+            LOG(INFO) << "------Optimize KF currentKF->mnId: " << currentKF->mnId;
             // Only optimize camera pose
             auto start = std::chrono::steady_clock::now();
-            mpTracker->PoseOptimization(currentKF, false);
+            LOG(INFO) << "======keyframe Pose Optimization";
+            mpTracker->Tracking::PoseOptimization(currentKF, false);    //语义位姿优化
             auto end = std::chrono::steady_clock::now();
             std::chrono::duration<double> diff = end - start;
             mvTimeSemanticOptimization.push_back(diff.count());
@@ -90,7 +123,8 @@ void Semantic::SemanticTrackingThread()
         frameCount++;
         // End while
     }
-    LOG(INFO) << "==============Semantic tracking thread finished================";
+    //cout << "==============Semantic tracking thread finished================" << endl;
+    LOG(INFO) << "========Semantic tracking thread finished=======" ;
 }
 
 
@@ -108,13 +142,14 @@ void Semantic::SemanticSegmentationThread()
     vKFs.reserve(mBatchSize);
     size_t ID;
 
-    LOG(INFO) << "==========Start Semantic Segmentation thread==========";
+    //cout << "==========Start Semantic Segmentation thread==========" << endl;
+    LOG(INFO) << "=======Start Semantic Segmentation thread======" ;
 
     // Initialize Mask R-CNN
     lySLAM::SegmentDynObject *MaskNet;
-    cout << "Loading Mask R-CNN. This could take a while..." << endl;
+    LOG(INFO) << "------Loading Mask R-CNN. This could take a while...";
     MaskNet = new lySLAM::SegmentDynObject();     //创建语义分割函数对象
-    cout << "Mask R-CNN loaded!" << endl;
+    LOG(INFO) << "------Mask R-CNN loaded!";
 
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     while (1) 
@@ -124,13 +159,14 @@ void Semantic::SemanticSegmentationThread()
             if (CheckFinish()) {    // 检查是否已经有外部线程请求终止当前线程
                 LOG(INFO) << "Semantic thread Stopping ....";
                 break;
-            } else {    //没有线程终止请求就不执行后续代码，继续检查是否有新的关键帧，
+            } else {    //没有“线程终止请求”就不执行后续代码，继续检查是否有新的关键帧，
+                //LOG(INFO) << "没有线程终止请求到来";
                 std::this_thread::sleep_for(std::chrono::milliseconds(1));
                 continue;
             } // end check finish
         }     // end check new task comming
-        LOG(INFO) << "=================================================";
-        std::cout << "=================================================" << std::endl;
+        LOG(INFO) << "==============================";
+        //std::cout << "===============================" << std::endl;
 
         //有新的关键帧到来
         vRequest.clear();
@@ -161,8 +197,10 @@ void Semantic::SemanticSegmentationThread()
 
         // request segmentation
         // mMaskRCNN->Segment(vRequest, vLabel, vScore, out_object_num);
-        //====================进行语义分割得到分割结果============================
+        //====================进行语义分割得到分割结果========
+        LOG(INFO) << "========调用关键的语义分割函数=========";
         MaskNet->SemanticSegmentation(vRequest, vLabel);
+        LOG(INFO) << "========语义分割结束=========";
 
 
         // save semantic results and generate mask image
@@ -171,13 +209,13 @@ void Semantic::SemanticSegmentationThread()
             this->GenerateMask(vKFs[i], true);
             // Must inform semantic ready before updating moving probability
             vKFs[i]->InformSemanticReady(true);
-            vKFs[i]->UpdatePrioriMovingProbability();
+            vKFs[i]->UpdatePrioriMovingProbability();   //重要：更新先验移动可能性
             if (vKFs[i]->mnFrameId > mnLatestSemanticKeyFrameID) {
                 mnLatestSemanticKeyFrameID = vKFs[i]->mnFrameId;
             }
             Config::GetInstance()->saveImage(vLabel[i], "label", std::to_string(vKFs[i]->mnId) + ".png"); //??
         }
-        LOG(INFO) << "=========Size of semantic queue: " << mlNewKeyFrames.size();
+        //LOG(INFO) << "=========Size of semantic queue: " << mlNewKeyFrames.size();
         std::cout << "=========Size of semantic queue: " << mlNewKeyFrames.size() << std::endl;
     }
 }
@@ -202,10 +240,10 @@ void Semantic::SemanticBAThread()
             }
         } // Is process request comming?
 
-        LOG(INFO) << "Size of semantic BA queue: " << mlSemanticBA.size();
-        // std::cout << "Size of semantic BA queue: " << mlSemanticBA.size() << std::endl;
-        // std::cout << "-----------Semantic BA:" << pKF->mnId << "-----------------" << std::endl;
-        LOG(INFO) << "-----------Semantic BA:" << pKF->mnId << "------------------";
+        //LOG(INFO) << "Size of semantic BA queue: " << mlSemanticBA.size();
+        std::cout << "Size of semantic BA queue: " << mlSemanticBA.size() << std::endl;
+        std::cout << "-----------Semantic BA:" << pKF->mnId << "-----------------" << std::endl;
+        //LOG(INFO) << "-----------Semantic BA:" << pKF->mnId << "------------------";
 
         // send request, get semantic label, mLabel
         std::unique_lock<std::mutex> lock(mMutexSemanticBA);
@@ -311,14 +349,14 @@ bool Semantic::CheckNewSemanticTrackRequest()
     return !(mlSemanticTrack.empty());
 }
 
-//检查新的关键帧
+//检查是否有新的关键帧
 bool Semantic::CheckNewKeyFrames()
 {
     if (mbIsUseSemantic == false) {
         return false;
     }
     std::unique_lock<std::mutex> lock(mMutexNewKFs);
-    bool ret = (mlNewKeyFrames.size() >= mBatchSize) ? true : false;        //？？？？
+    bool ret = (mlNewKeyFrames.size() >= mBatchSize) ? true : false;        //新的关键帧要大于BatchSize
     return ret;
 }
 
@@ -326,16 +364,16 @@ bool Semantic::CheckNewKeyFrames()
 bool Semantic::CheckNewSemanticRequest()
 {
     std::unique_lock<std::mutex> lock(mMutexNewSemanticRequest);
-    bool ret = (mlNewSemanticRequest.size() >= mBatchSize) ? true : false;  //???
+    bool ret = (mlNewSemanticRequest.size() >= mBatchSize) ? true : false;  //语义请求关键帧要大于BatchSize
     return ret;
 }
 
-//===========???
+//==========请求语义分割线程结束========
 void Semantic::RequestFinish()
 {
     std::unique_lock<std::mutex> lock(mMutexFinish);
     mbFinishRequested = true;
-    LOG(INFO) << "Semantic thread request stop";
+    LOG(INFO) << "------Semantic thread request stop";
     lock.unlock();
 
     std::this_thread::sleep_for(std::chrono::milliseconds(300));
@@ -347,56 +385,57 @@ void Semantic::RequestFinish()
         mptSemanticTracking->join();
 
     // for debugging
-    // FinalStage();
+    FinalStage();
 }
 
-// void Semantic::FinalStage()
-// {
-//     LOG(INFO) << "[Semantic] FinalStage, some results are saved at ~/.ros";
-//     // To evaluate the time delay between sequential model and bi-direction model
-//     std::ofstream fSemanticDelay;
-//     fSemanticDelay.open("SemanticDelay.txt");
-//     fSemanticDelay << "FrameID"
-//                    << ","
-//                    << "Delay\n";
-//     int nTotalSemanticDelay = -1;
-//     for (size_t i = 0; i < mvSemanticDelay.size(); i++) {
-//         fSemanticDelay << i << "," << mvSemanticDelay[i] << "\n";
-//         nTotalSemanticDelay += mvSemanticDelay[i];
-//     }
-//     LOG(INFO) << "Average Semantic Delay: " << nTotalSemanticDelay / mvSemanticDelay.size() << " Frames";
-//     std::cout << "Average Semantic Delay: " << nTotalSemanticDelay / mvSemanticDelay.size() << " Frames" << std::endl;
-//
-//     // ----------------------------------------
-//     // Total keyframe number that segmented
-//     // Please shutdown SLAM once tracking is finished, otherwise this value will be not accurate
-//     LOG(INFO) << "Total semantic KeyFrame Num: " << mnTotalSemanticFrameNum;
-//     std::cout << "Total semantic KeyFrame Num: " << mnTotalSemanticFrameNum << std::endl;
-//
-//     // Time evaluation of mvoving probability updating model
-//     float nToalTimeUpdateMovingProbability = 0;
-//     for (size_t i = 0; i < mvTimeUpdateMovingProbability.size(); i++) {
-//         nToalTimeUpdateMovingProbability += (float)mvTimeUpdateMovingProbability[i];
-//     }
-//     LOG(INFO) << "Average time of moving probability updating: " << nToalTimeUpdateMovingProbability / mvTimeUpdateMovingProbability.size() * 1000 << " ms";
-//     std::cout << "Average time of moving probability updating: " << nToalTimeUpdateMovingProbability / mvTimeUpdateMovingProbability.size() * 1000 << " ms" << std::endl;
-//
-//     // Time evaluation of mask generation
-//     float nTotalTimeMaskGeneration = 0;
-//     for (size_t i = 0; i < mvTimeMaskGeneration.size(); i++) {
-//         nTotalTimeMaskGeneration += (float)mvTimeMaskGeneration[i];
-//     }
-//     LOG(INFO) << "Average time of mask generation: " << nTotalTimeMaskGeneration / mvTimeMaskGeneration.size() * 1000 << " ms";
-//     std::cout << "Average time of mask generation: " << nTotalTimeMaskGeneration / mvTimeMaskGeneration.size() * 1000 << " ms" << std::endl;
-//
-//     // TIme evaluation for semanti-based Optimization
-//     float nTotalSemanticBasedOptimization = 0;
-//     for (int i = 0; i < mvTimeSemanticOptimization.size(); i++) {
-//         nTotalSemanticBasedOptimization += mvTimeSemanticOptimization[i];
-//     }
-//     LOG(INFO) << "Average time of semantic optimization: " << nTotalSemanticBasedOptimization / mvTimeMaskGeneration.size() * 1000 << " ms";
-//     std::cout << "Average time of semantic optimization: " << nTotalSemanticBasedOptimization / mvTimeMaskGeneration.size() * 1000 << " ms" << std::endl;
-// }
+void Semantic::FinalStage()
+{
+    //LOG(INFO) << "[Semantic] FinalStage, some results are saved at ~/.ros";
+    LOG(INFO) << "==========[Semantic] FinalStage==============";
+    // To evaluate the time delay between sequential model and bi-direction model
+    // std::ofstream fSemanticDelay;
+    // fSemanticDelay.open("SemanticDelay.txt");
+    // fSemanticDelay << "FrameID"
+    //                << ","
+    //                << "Delay\n";
+    // int nTotalSemanticDelay = -1;
+    // for (size_t i = 0; i < mvSemanticDelay.size(); i++) {
+    //     fSemanticDelay << i << "," << mvSemanticDelay[i] << "\n";
+    //     nTotalSemanticDelay += mvSemanticDelay[i];
+    // }
+    // //cout << "------Average Semantic Delay: " << nTotalSemanticDelay / mvSemanticDelay.size() << " Frames";
+    // std::cout << "Average Semantic Delay: " << nTotalSemanticDelay / mvSemanticDelay.size() << " Frames" << std::endl;
+
+    // ----------------------------------------
+    // Total keyframe number that segmented
+    // Please shutdown SLAM once tracking is finished, otherwise this value will be not accurate
+    //LOG(INFO) << "-------Total semantic KeyFrame Nums: " << mnTotalSemanticFrameNum;
+    std::cout << "------Total semantic KeyFrame Nums: " << mnTotalSemanticFrameNum << std::endl;
+
+    // Time evaluation of mvoving probability updating model
+    float nToalTimeUpdateMovingProbability = 0;
+    for (size_t i = 0; i < mvTimeUpdateMovingProbability.size(); i++) {
+        nToalTimeUpdateMovingProbability += (float)mvTimeUpdateMovingProbability[i];
+    }
+    //LOG(INFO) << "-------Average time of moving probability updating: " << nToalTimeUpdateMovingProbability / mvTimeUpdateMovingProbability.size() * 1000 << " ms";
+    std::cout << "Average time of moving probability updating: " << nToalTimeUpdateMovingProbability / mvTimeUpdateMovingProbability.size() * 1000 << " ms" << std::endl;
+
+    // Time evaluation of mask generation
+    float nTotalTimeMaskGeneration = 0;
+    for (size_t i = 0; i < mvTimeMaskGeneration.size(); i++) {
+        nTotalTimeMaskGeneration += (float)mvTimeMaskGeneration[i];
+    }
+    //LOG(INFO) << "------Average time of mask generation: " << nTotalTimeMaskGeneration / mvTimeMaskGeneration.size() * 1000 << " ms";
+    std::cout << "Average time of mask generation: " << nTotalTimeMaskGeneration / mvTimeMaskGeneration.size() * 1000 << " ms" << std::endl;
+
+    // Time evaluation for semanti-based Optimization
+    float nTotalSemanticBasedOptimization = 0;
+    for (int i = 0; i < mvTimeSemanticOptimization.size(); i++) {
+        nTotalSemanticBasedOptimization += mvTimeSemanticOptimization[i];
+    }
+    //LOG(INFO) << "------Average time of semantic optimization: " << nTotalSemanticBasedOptimization / mvTimeMaskGeneration.size() * 1000 << " ms";
+    std::cout << "Average time of semantic optimization: " << nTotalSemanticBasedOptimization / mvTimeMaskGeneration.size() * 1000 << " ms" << std::endl;
+}
 
 // 检查是否已经有外部线程请求终止当前线程
 bool Semantic::CheckFinish()
@@ -430,37 +469,6 @@ void Semantic::SetSemanticMethod(const std::string& cnn_method)
 }
 
 
-//各参数
-Semantic::Semantic()
-{
-    //msCnnMethod = "segnet"; // or "maskrcnn"
-    mnLatestSemanticKeyFrameID = 0;
-    mnTotalSemanticFrameNum = 0;
-
-    // statistics
-    // Resrve space of total frame number int TUM dataset
-    mvTimeUpdateMovingProbability.reserve(1000);
-    mvTimeMaskGeneration.reserve(1000);
-    mvTimeSemanticOptimization.reserve(1000);
-
-    mBatchSize = 2;
-    mbFinishRequested = false;
-
-    // Morphological filter
-    mDilation_size = 15;
-    mKernel = getStructuringElement(cv::MORPH_ELLIPSE,
-        cv::Size(2 * mDilation_size + 1, 2 * mDilation_size + 1),
-        cv::Point(mDilation_size, mDilation_size));
-
-    // threshold for moving probablility of map points
-    mthDynamicThreshold = 0.5;
-    // segment the first few frames
-    mnSegmentFrameNum = 1;
-    mbIsUseSemantic = true;
-    // Start a semantic tracing thread
-    LOG(INFO) << "Create Semantic instance and start new thread";
-}
-
 //产生Mask
 void Semantic::GenerateMask(KeyFrame* pKF, const bool isDilate)
 {
@@ -470,7 +478,7 @@ void Semantic::GenerateMask(KeyFrame* pKF, const bool isDilate)
         return;
     }
 
-    LOG(INFO) << "Generate Mask for Frame: " << pKF->mnId;
+    LOG(INFO) << "-------Generate Mask for Frame: " << pKF->mnId;
 
     auto start = std::chrono::steady_clock::now();
 
@@ -523,7 +531,7 @@ void Semantic::SetTracker(Tracking* pTracker)
 {
     mpTracker = pTracker;
     if (mpTracker) {
-        LOG(INFO) << "========================Set tracker instance";
+        LOG(INFO) << "=====Set tracker instance";
     }
 }
 

@@ -284,6 +284,7 @@ cv::Mat Tracking::GrabImageMonocular(const cv::Mat &im, const cv::Mat &mask, con
 
 void Tracking::Track()
 {
+    LOG(INFO) << "=======Start Track!";
     if(mState==NO_IMAGES_YET)
     {
         mState = NOT_INITIALIZED;
@@ -660,6 +661,7 @@ void Tracking::StereoInitialization()
         }
 
         cout << "New map created with " << mpMap->MapPointsInMap() << " points" << endl;
+        LOG(INFO) << "New map created with " << mpMap->MapPointsInMap() << " points";
 
         mpLocalMapper->InsertKeyFrame(pKFini);
 
@@ -804,6 +806,7 @@ void Tracking::CreateInitialMapMonocular()
 
     // Bundle Adjustment
     cout << "New Map created with " << mpMap->MapPointsInMap() << " points" << endl;
+    LOG(INFO) << "New Map created with " << mpMap->MapPointsInMap() << " points";
 
     Optimizer::GlobalBundleAdjustemnt(mpMap,20);
 
@@ -1253,6 +1256,17 @@ void Tracking::CreateNewKeyFrame()
 
     KeyFrame* pKF = new KeyFrame(mCurrentFrame,mpMap,mpKeyFrameDB);
 
+    // ===========[Semantic] request segmentation
+    Semantic::GetInstance()->InsertKeyFrame(pKF);
+    mCurrentFrame.mbIsKeyFrame = true;
+    // Semantic::GetInstance()->WaitSemanticResultBlocked();
+    // Semantic::GetInstance()->WaitSeveralSemanticResultBlocked();
+
+    // mpCurrentFrame = new Frame(mCurrentFrame);
+    // Semantic::GetInstance()->InsertFrame(mpCurrentFrame);
+    // mpCurrentFrame->mbIsKeyFrame = true;
+    // mpCurrentFrame->mGeneratedKeyFrame = pKF;
+
     mpReferenceKF = pKF;
     mCurrentFrame.mpReferenceKF = pKF;
 
@@ -1319,6 +1333,11 @@ void Tracking::CreateNewKeyFrame()
     }
 
     mpLocalMapper->InsertKeyFrame(pKF);
+
+    // TODO [Semantic]  Add Keyframe to semantic segmentation queue
+    // boost::timer timer;
+    // Semantic::GetInstance()->InsertKeyFrame(pKF);
+    // LOG(INFO) << "Semantic: insert keyframe [" << mCurrentFrame.mnId << "];" << timer.elapsed() * 1000 << " ms";
 
     mpLocalMapper->SetNotStop(false);
 
@@ -1774,28 +1793,37 @@ void Tracking::InformOnlyTracking(const bool &flag)
     mbOnlyTracking = flag;
 }
 
-//============================PredictSemanticMask===============================
+//============================Predict SemanticMask===============================
 void Tracking::PredictSemanticMask(KeyFrame* lastKF, KeyFrame* currentKF)
 {
+    LOG(INFO) << "======Start Predict SemanticMask======";
+    
+    const float &fx = lastKF->fx;
+    const float &fy = lastKF->fy;
+    const float &cx = lastKF->cx;
+    const float &cy = lastKF->cy;
+    
     std::vector<cv::Point> vBackground;
-    std::vector<cv::Point> vForeground;
+    std::vector<cv::Point> vForeground;     //动点
     vBackground.reserve(currentKF->N);
     vForeground.reserve(currentKF->N);
 
     // cv::Mat showProject = currentKF->mImRGB.clone();
     cv::Mat showCurrent = currentKF->mImRGB.clone();
 
-    ORBmatcher matcher(0.9, true);
+    ORBmatcher matcher(0.9, true);  //创建ORBmatcher类对象
 
-    // Search by projection
+    // ========Search by projection=======
     int nmatches = 0;
-    cv::Mat Rcw = lastKF->GetPose().rowRange(0, 3).colRange(0, 3);
-    cv::Mat tcw = lastKF->GetPose().rowRange(0, 3).col(3);
-    cv::Mat Ow = -Rcw.t() * tcw;
+    const cv::Mat Rcw = lastKF->GetPose().rowRange(0, 3).colRange(0, 3);
+    const cv::Mat tcw = lastKF->GetPose().rowRange(0, 3).col(3);
+    
+    const cv::Mat twc = -Rcw.t() * tcw;
+
     for (size_t i = 0; i < currentKF->N; i++) {
         MapPoint* pMP = currentKF->mvpMapPoints[i];
-        bool bCreateNew = false;
-        if (!pMP) {
+        bool bCreateNew = false;    //默认不创建
+        if (!pMP) { //
             bCreateNew = true;
         } else {
             if (pMP->isBad()) {
@@ -1803,7 +1831,7 @@ void Tracking::PredictSemanticMask(KeyFrame* lastKF, KeyFrame* currentKF)
             }
         }
 
-        if (bCreateNew) {
+        if (bCreateNew) {  //????
             float z;
             z = currentKF->mvDepth[i];
             if (z < 0) {
@@ -1823,26 +1851,22 @@ void Tracking::PredictSemanticMask(KeyFrame* lastKF, KeyFrame* currentKF)
         cv::Mat x3Dw = pMP->GetWorldPos();
         cv::Mat x3Dc = Rcw * x3Dw + tcw;
 
-        const float &PcX = x3Dc.at<float>(0);
-        const float &PcY = x3Dc.at<float>(1);
-        const float &PcZ = x3Dc.at<float>(2);
+        const float invzc = 1.0/x3Dc.at<float>(2);
+        const float x = x3Dc.at<float>(0)*invzc;
+        const float y = x3Dc.at<float>(1)*invzc;
+        
+        if(invzc<0)
+             continue;
+        
+        float u = fx*x + cx;
+        float v = fy*y + cy;
 
-        if(PcZ<0.0f)
+        if (u < lastKF->mnMinX || u > lastKF->mnMaxX)
+            continue;
+        if (u < lastKF->mnMinY || v > lastKF->mnMaxY)
             continue;
 
-        //*****????=====================================================
-        //cv::Point2f uv = lastKF->mpCamera->project(x3Dc);
-        const float invz = 1.0f/PcZ;
-        cv::Point2f uv;
-        uv.x = fx * PcX * invz + cx;
-        uv.y = fy*PcY*invz+cy;
-
-        if (uv.x < lastKF->mnMinX || uv.x > lastKF->mnMaxX)
-            continue;
-        if (uv.y < lastKF->mnMinY || uv.y > lastKF->mnMaxY)
-            continue;
-
-        cv::Mat PO = x3Dw - Ow;
+        cv::Mat PO = x3Dw - twc;
         float dist3D = cv::norm(PO);
 
         const float maxDistance = pMP->GetMaxDistanceInvariance();
@@ -1856,7 +1880,8 @@ void Tracking::PredictSemanticMask(KeyFrame* lastKF, KeyFrame* currentKF)
         // Search in a window
         int th = 15;
         const float radius = th * lastKF->mvScaleFactors[nPredictedLevel];
-        const vector<size_t> vIndices2 = lastKF->GetFeaturesInArea(uv.x, uv.y, radius);
+        const vector<size_t> vIndices2 = lastKF->GetFeaturesInArea(u, v, radius);
+        
         if (vIndices2.empty())
             continue;
         const cv::Mat dMP = pMP->GetDescriptor();
@@ -1944,13 +1969,14 @@ void Tracking::PredictSemanticMask(KeyFrame* lastKF, KeyFrame* currentKF)
         Config::GetInstance()->saveImage(res, "debug", "fgd_" + std::to_string(currentKF->mnId) + ".png");
     }
 
-    // Config::GetInstance()->saveImage(showCurrent, "debug", "cur_" + std::to_string(currentKF->mnId) + ".png");
+    Config::GetInstance()->saveImage(showCurrent, "debug", "cur_" + std::to_string(currentKF->mnId) + ".png");
     // cv::imshow("KeyFrame", showCurrent);
 }
 
 //======================================
 void Tracking::PredictFeatureProbability(KeyFrame* lastKF, KeyFrame* currentKF)
 {
+    LOG(INFO) << "======Start Predict FeatureProbability";
     cv::Mat showCurrent = currentKF->mImRGB.clone();
 
     ORBmatcher matcher(0.9, true);

@@ -1,0 +1,64 @@
+\hypertarget{ORBextractor_8cc}{}\section{O\+R\+Bextractor.\+cc File Reference}
+\label{ORBextractor_8cc}\index{O\+R\+Bextractor.\+cc@{O\+R\+Bextractor.\+cc}}
+{\ttfamily \#include $<$opencv2/core/core.\+hpp$>$}\\*
+{\ttfamily \#include $<$opencv2/highgui/highgui.\+hpp$>$}\\*
+{\ttfamily \#include $<$opencv2/features2d/features2d.\+hpp$>$}\\*
+{\ttfamily \#include $<$opencv2/imgproc/imgproc.\+hpp$>$}\\*
+{\ttfamily \#include $<$vector$>$}\\*
+{\ttfamily \#include \char`\"{}O\+R\+Bextractor.\+h\char`\"{}}\\*
+Include dependency graph for O\+R\+Bextractor.\+cc\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{ORBextractor_8cc__incl}
+\end{center}
+\end{figure}
+\subsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+ \hyperlink{namespaceORB__SLAM2}{O\+R\+B\+\_\+\+S\+L\+A\+M2}
+\end{DoxyCompactItemize}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{ORBextractor_8cc_a35931865021519a9d7a2a4d2f196e684}{G\+E\+T\+\_\+\+V\+A\+L\+UE}(idx)
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+static float \hyperlink{namespaceORB__SLAM2_ac570dbdaae2d483745515b5022fd6820}{O\+R\+B\+\_\+\+S\+L\+A\+M2\+::\+I\+C\+\_\+\+Angle} (const Mat \&image, Point2f pt, const vector$<$ int $>$ \&u\+\_\+max)
+\item 
+static void \hyperlink{namespaceORB__SLAM2_a932693f631bfe871700d02c72e14c6cd}{O\+R\+B\+\_\+\+S\+L\+A\+M2\+::compute\+Orb\+Descriptor} (const Key\+Point \&kpt, const Mat \&img, const Point $\ast$pattern, uchar $\ast$desc)
+\item 
+static void \hyperlink{namespaceORB__SLAM2_a40adb6b621d7c2dd9d2961ba88e445c8}{O\+R\+B\+\_\+\+S\+L\+A\+M2\+::compute\+Orientation} (const Mat \&image, vector$<$ Key\+Point $>$ \&keypoints, const vector$<$ int $>$ \&umax)
+\item 
+static void \hyperlink{namespaceORB__SLAM2_ad90997cdb916a99c644c0959e08cf4df}{O\+R\+B\+\_\+\+S\+L\+A\+M2\+::compute\+Descriptors} (const Mat \&image, vector$<$ Key\+Point $>$ \&keypoints, Mat \&descriptors, const vector$<$ Point $>$ \&pattern)
+\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+const int \hyperlink{namespaceORB__SLAM2_a557e5c298c5f7164667f083494c2197a}{O\+R\+B\+\_\+\+S\+L\+A\+M2\+::\+P\+A\+T\+C\+H\+\_\+\+S\+I\+ZE} = 31
+\item 
+const int \hyperlink{namespaceORB__SLAM2_aa09849ae679bf2392b097abd710d8d7f}{O\+R\+B\+\_\+\+S\+L\+A\+M2\+::\+H\+A\+L\+F\+\_\+\+P\+A\+T\+C\+H\+\_\+\+S\+I\+ZE} = 15
+\item 
+const int \hyperlink{namespaceORB__SLAM2_aec00f1ad4dea35755e3af4404282cd3b}{O\+R\+B\+\_\+\+S\+L\+A\+M2\+::\+E\+D\+G\+E\+\_\+\+T\+H\+R\+E\+S\+H\+O\+LD} = 19
+\item 
+const float \hyperlink{namespaceORB__SLAM2_a8015b470ffeb885a0c90837a03b3210f}{O\+R\+B\+\_\+\+S\+L\+A\+M2\+::factor\+PI} = (float)(C\+V\+\_\+\+PI/180.f)
+\item 
+static int \hyperlink{namespaceORB__SLAM2_a8dd21ee063eca2b0bc3f5e76ceba0492}{O\+R\+B\+\_\+\+S\+L\+A\+M2\+::bit\+\_\+pattern\+\_\+31\+\_\+} \mbox{[}256 $\ast$4\mbox{]}
+\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\index{O\+R\+Bextractor.\+cc@{O\+R\+Bextractor.\+cc}!G\+E\+T\+\_\+\+V\+A\+L\+UE@{G\+E\+T\+\_\+\+V\+A\+L\+UE}}
+\index{G\+E\+T\+\_\+\+V\+A\+L\+UE@{G\+E\+T\+\_\+\+V\+A\+L\+UE}!O\+R\+Bextractor.\+cc@{O\+R\+Bextractor.\+cc}}
+\subsubsection[{\texorpdfstring{G\+E\+T\+\_\+\+V\+A\+L\+UE}{GET_VALUE}}]{\setlength{\rightskip}{0pt plus 5cm}\#define G\+E\+T\+\_\+\+V\+A\+L\+UE(
+\begin{DoxyParamCaption}
+\item[{}]{idx}
+\end{DoxyParamCaption}
+)}\hypertarget{ORBextractor_8cc_a35931865021519a9d7a2a4d2f196e684}{}\label{ORBextractor_8cc_a35931865021519a9d7a2a4d2f196e684}
+{\bfseries Value\+:}
+\begin{DoxyCode}
+center[cvRound(pattern[idx].x*b + pattern[idx].y*a)*step + \(\backslash\)
+               cvRound(pattern[idx].x*a - pattern[idx].y*b)]
+\end{DoxyCode}

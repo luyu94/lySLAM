@@ -310,7 +310,7 @@ set<MapPoint*> KeyFrame::GetMapPoints()
     return s;
 }
 
-//====================================
+//====================================================
 int KeyFrame::TrackedMapPoints(const int &minObs)
 {
     unique_lock<mutex> lock(mMutexFeatures);
@@ -338,7 +338,6 @@ int KeyFrame::TrackedMapPoints(const int &minObs)
             }
         }
     }
-
     return nPoints;
 }
 
@@ -356,7 +355,7 @@ MapPoint* KeyFrame::GetMapPoint(const size_t &idx)
 
 void KeyFrame::UpdateConnections()
 {
-    map<KeyFrame*,int> KFcounter;
+    map<KeyFrame*, int> KFcounter;
 
     vector<MapPoint*> vpMP;
 
@@ -680,6 +679,12 @@ bool KeyFrame::IsInImage(const float &x, const float &y) const
     return (x>=mnMinX && x<mnMaxX && y>=mnMinY && y<mnMaxY);
 }
 
+
+/**
+ * @brief 在双目和RGBD情况下将特征点反投影到空间中得到世界坐标系下三维点
+ * @param[in] i  第i个特征点
+ * @return cv::Mat  返回世界坐标系下三维点
+ */
 cv::Mat KeyFrame::UnprojectStereo(int i)
 {
     const float z = mvDepth[i];
@@ -829,6 +834,7 @@ void KeyFrame::InformSemanticReady(const bool bSemanticReady)
     mbSemanticReady = bSemanticReady;
 }
 
+//语义分割准备好，就为false
 bool KeyFrame::IsSemanticReady()
 {
     std::unique_lock<mutex> lock(mMutexSemantic);

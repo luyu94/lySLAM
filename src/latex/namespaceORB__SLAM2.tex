@@ -1,0 +1,270 @@
+\hypertarget{namespaceORB__SLAM2}{}\section{O\+R\+B\+\_\+\+S\+L\+A\+M2 Namespace Reference}
+\label{namespaceORB__SLAM2}\index{O\+R\+B\+\_\+\+S\+L\+A\+M2@{O\+R\+B\+\_\+\+S\+L\+A\+M2}}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+static float \hyperlink{namespaceORB__SLAM2_ac570dbdaae2d483745515b5022fd6820}{I\+C\+\_\+\+Angle} (const Mat \&image, Point2f pt, const vector$<$ int $>$ \&u\+\_\+max)
+\item 
+static void \hyperlink{namespaceORB__SLAM2_a932693f631bfe871700d02c72e14c6cd}{compute\+Orb\+Descriptor} (const Key\+Point \&kpt, const Mat \&img, const Point $\ast$pattern, uchar $\ast$desc)
+\item 
+static void \hyperlink{namespaceORB__SLAM2_a40adb6b621d7c2dd9d2961ba88e445c8}{compute\+Orientation} (const Mat \&image, vector$<$ Key\+Point $>$ \&keypoints, const vector$<$ int $>$ \&umax)
+\item 
+static void \hyperlink{namespaceORB__SLAM2_ad90997cdb916a99c644c0959e08cf4df}{compute\+Descriptors} (const Mat \&image, vector$<$ Key\+Point $>$ \&keypoints, Mat \&descriptors, const vector$<$ Point $>$ \&pattern)
+\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+const int \hyperlink{namespaceORB__SLAM2_a557e5c298c5f7164667f083494c2197a}{P\+A\+T\+C\+H\+\_\+\+S\+I\+ZE} = 31
+\item 
+const int \hyperlink{namespaceORB__SLAM2_aa09849ae679bf2392b097abd710d8d7f}{H\+A\+L\+F\+\_\+\+P\+A\+T\+C\+H\+\_\+\+S\+I\+ZE} = 15
+\item 
+const int \hyperlink{namespaceORB__SLAM2_aec00f1ad4dea35755e3af4404282cd3b}{E\+D\+G\+E\+\_\+\+T\+H\+R\+E\+S\+H\+O\+LD} = 19
+\item 
+const float \hyperlink{namespaceORB__SLAM2_a8015b470ffeb885a0c90837a03b3210f}{factor\+PI} = (float)(C\+V\+\_\+\+PI/180.f)
+\item 
+static int \hyperlink{namespaceORB__SLAM2_a8dd21ee063eca2b0bc3f5e76ceba0492}{bit\+\_\+pattern\+\_\+31\+\_\+} \mbox{[}256 $\ast$4\mbox{]}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+This file is part of O\+R\+B-\/\+S\+L\+A\+M2.
+
+Copyright (C) 2014-\/2016 Raúl Mur-\/\+Artal $<$raulmur at=\char`\"{}\char`\"{} unizar=\char`\"{}\char`\"{} dot=\char`\"{}\char`\"{} es$>$=\char`\"{}\char`\"{}$>$ (University of Zaragoza) For more information see \href{https://github.com/raulmur/ORB_SLAM2}{\tt https\+://github.\+com/raulmur/\+O\+R\+B\+\_\+\+S\+L\+A\+M2}
+
+O\+R\+B-\/\+S\+L\+A\+M2 is free software\+: you can redistribute it and/or modify it under the terms of the G\+NU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+
+O\+R\+B-\/\+S\+L\+A\+M2 is distributed in the hope that it will be useful, but W\+I\+T\+H\+O\+UT A\+NY W\+A\+R\+R\+A\+N\+TY; without even the implied warranty of M\+E\+R\+C\+H\+A\+N\+T\+A\+B\+I\+L\+I\+TY or F\+I\+T\+N\+E\+SS F\+OR A P\+A\+R\+T\+I\+C\+U\+L\+AR P\+U\+R\+P\+O\+SE. See the G\+NU General Public License for more details.
+
+You should have received a copy of the G\+NU General Public License along with O\+R\+B-\/\+S\+L\+A\+M2. If not, see \href{http://www.gnu.org/licenses/}{\tt http\+://www.\+gnu.\+org/licenses/}.
+
+This file is a modified version of O\+R\+B-\/\+S\+L\+A\+M2.\href{https://github.com/raulmur/ORB_SLAM2}{\tt https\+://github.\+com/raulmur/\+O\+R\+B\+\_\+\+S\+L\+A\+M2}
+
+This file is part of Dyna\+S\+L\+AM. Copyright (C) 2018 Berta Bescos $<$bbescos at=\char`\"{}\char`\"{} unizar=\char`\"{}\char`\"{} dot=\char`\"{}\char`\"{} es$>$=\char`\"{}\char`\"{}$>$ (University of Zaragoza) For more information see \href{https://github.com/bertabescos/DynaSLAM}{\tt https\+://github.\+com/bertabescos/\+Dyna\+S\+L\+AM}. 
+
+\subsection{Function Documentation}
+\index{O\+R\+B\+\_\+\+S\+L\+A\+M2@{O\+R\+B\+\_\+\+S\+L\+A\+M2}!compute\+Descriptors@{compute\+Descriptors}}
+\index{compute\+Descriptors@{compute\+Descriptors}!O\+R\+B\+\_\+\+S\+L\+A\+M2@{O\+R\+B\+\_\+\+S\+L\+A\+M2}}
+\subsubsection[{\texorpdfstring{compute\+Descriptors(const Mat \&image, vector$<$ Key\+Point $>$ \&keypoints, Mat \&descriptors, const vector$<$ Point $>$ \&pattern)}{computeDescriptors(const Mat &image, vector< KeyPoint > &keypoints, Mat &descriptors, const vector< Point > &pattern)}}]{\setlength{\rightskip}{0pt plus 5cm}static void O\+R\+B\+\_\+\+S\+L\+A\+M2\+::compute\+Descriptors (
+\begin{DoxyParamCaption}
+\item[{const Mat \&}]{image, }
+\item[{vector$<$ Key\+Point $>$ \&}]{keypoints, }
+\item[{Mat \&}]{descriptors, }
+\item[{const vector$<$ Point $>$ \&}]{pattern}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{namespaceORB__SLAM2_ad90997cdb916a99c644c0959e08cf4df}{}\label{namespaceORB__SLAM2_ad90997cdb916a99c644c0959e08cf4df}
+
+
+Definition at line 1034 of file O\+R\+Bextractor.\+cc.
+
+
+\begin{DoxyCode}
+1036 \{
+1037     descriptors = Mat::zeros((\textcolor{keywordtype}{int})keypoints.size(), 32, CV\_8UC1);
+1038 
+1039     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < keypoints.size(); i++)
+1040         \hyperlink{namespaceORB__SLAM2_a932693f631bfe871700d02c72e14c6cd}{computeOrbDescriptor}(keypoints[i], image, &pattern[0], descriptors.ptr((\textcolor{keywordtype}{int})i))
+      ;
+1041 \}
+\end{DoxyCode}
+
+
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespaceORB__SLAM2_ad90997cdb916a99c644c0959e08cf4df_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{O\+R\+B\+\_\+\+S\+L\+A\+M2@{O\+R\+B\+\_\+\+S\+L\+A\+M2}!compute\+Orb\+Descriptor@{compute\+Orb\+Descriptor}}
+\index{compute\+Orb\+Descriptor@{compute\+Orb\+Descriptor}!O\+R\+B\+\_\+\+S\+L\+A\+M2@{O\+R\+B\+\_\+\+S\+L\+A\+M2}}
+\subsubsection[{\texorpdfstring{compute\+Orb\+Descriptor(const Key\+Point \&kpt, const Mat \&img, const Point $\ast$pattern, uchar $\ast$desc)}{computeOrbDescriptor(const KeyPoint &kpt, const Mat &img, const Point *pattern, uchar *desc)}}]{\setlength{\rightskip}{0pt plus 5cm}static void O\+R\+B\+\_\+\+S\+L\+A\+M2\+::compute\+Orb\+Descriptor (
+\begin{DoxyParamCaption}
+\item[{const Key\+Point \&}]{kpt, }
+\item[{const Mat \&}]{img, }
+\item[{const Point $\ast$}]{pattern, }
+\item[{uchar $\ast$}]{desc}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{namespaceORB__SLAM2_a932693f631bfe871700d02c72e14c6cd}{}\label{namespaceORB__SLAM2_a932693f631bfe871700d02c72e14c6cd}
+
+
+Definition at line 108 of file O\+R\+Bextractor.\+cc.
+
+
+\begin{DoxyCode}
+111 \{
+112     \textcolor{keywordtype}{float} angle = (float)kpt.angle*\hyperlink{namespaceORB__SLAM2_a8015b470ffeb885a0c90837a03b3210f}{factorPI};
+113     \textcolor{keywordtype}{float} a = (\textcolor{keywordtype}{float})cos(angle), b = (float)sin(angle);
+114 
+115     \textcolor{keyword}{const} uchar* center = &img.at<uchar>(cvRound(kpt.pt.y), cvRound(kpt.pt.x));
+116     \textcolor{keyword}{const} \textcolor{keywordtype}{int} step = (int)img.step;
+117 
+118     #define \hyperlink{ORBextractor_8cc_a35931865021519a9d7a2a4d2f196e684}{GET\_VALUE}(idx) \(\backslash\)
+119         center[cvRound(pattern[idx].x*b + pattern[idx].y*a)*step + \(\backslash\)
+120                cvRound(pattern[idx].x*a - pattern[idx].y*b)]
+121 
+122 
+123     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < 32; ++i, pattern += 16)
+124     \{
+125         \textcolor{keywordtype}{int} t0, t1, val;
+126         t0 = \hyperlink{ORBextractor_8cc_a35931865021519a9d7a2a4d2f196e684}{GET\_VALUE}(0); t1 = \hyperlink{ORBextractor_8cc_a35931865021519a9d7a2a4d2f196e684}{GET\_VALUE}(1);
+127         val = t0 < t1;
+128         t0 = \hyperlink{ORBextractor_8cc_a35931865021519a9d7a2a4d2f196e684}{GET\_VALUE}(2); t1 = \hyperlink{ORBextractor_8cc_a35931865021519a9d7a2a4d2f196e684}{GET\_VALUE}(3);
+129         val |= (t0 < t1) << 1;
+130         t0 = \hyperlink{ORBextractor_8cc_a35931865021519a9d7a2a4d2f196e684}{GET\_VALUE}(4); t1 = \hyperlink{ORBextractor_8cc_a35931865021519a9d7a2a4d2f196e684}{GET\_VALUE}(5);
+131         val |= (t0 < t1) << 2;
+132         t0 = \hyperlink{ORBextractor_8cc_a35931865021519a9d7a2a4d2f196e684}{GET\_VALUE}(6); t1 = \hyperlink{ORBextractor_8cc_a35931865021519a9d7a2a4d2f196e684}{GET\_VALUE}(7);
+133         val |= (t0 < t1) << 3;
+134         t0 = \hyperlink{ORBextractor_8cc_a35931865021519a9d7a2a4d2f196e684}{GET\_VALUE}(8); t1 = \hyperlink{ORBextractor_8cc_a35931865021519a9d7a2a4d2f196e684}{GET\_VALUE}(9);
+135         val |= (t0 < t1) << 4;
+136         t0 = \hyperlink{ORBextractor_8cc_a35931865021519a9d7a2a4d2f196e684}{GET\_VALUE}(10); t1 = \hyperlink{ORBextractor_8cc_a35931865021519a9d7a2a4d2f196e684}{GET\_VALUE}(11);
+137         val |= (t0 < t1) << 5;
+138         t0 = \hyperlink{ORBextractor_8cc_a35931865021519a9d7a2a4d2f196e684}{GET\_VALUE}(12); t1 = \hyperlink{ORBextractor_8cc_a35931865021519a9d7a2a4d2f196e684}{GET\_VALUE}(13);
+139         val |= (t0 < t1) << 6;
+140         t0 = \hyperlink{ORBextractor_8cc_a35931865021519a9d7a2a4d2f196e684}{GET\_VALUE}(14); t1 = \hyperlink{ORBextractor_8cc_a35931865021519a9d7a2a4d2f196e684}{GET\_VALUE}(15);
+141         val |= (t0 < t1) << 7;
+142 
+143         desc[i] = (uchar)val;
+144     \}
+145 
+146 \textcolor{preprocessor}{    #undef GET\_VALUE}
+147 \}
+\end{DoxyCode}
+
+
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespaceORB__SLAM2_a932693f631bfe871700d02c72e14c6cd_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{O\+R\+B\+\_\+\+S\+L\+A\+M2@{O\+R\+B\+\_\+\+S\+L\+A\+M2}!compute\+Orientation@{compute\+Orientation}}
+\index{compute\+Orientation@{compute\+Orientation}!O\+R\+B\+\_\+\+S\+L\+A\+M2@{O\+R\+B\+\_\+\+S\+L\+A\+M2}}
+\subsubsection[{\texorpdfstring{compute\+Orientation(const Mat \&image, vector$<$ Key\+Point $>$ \&keypoints, const vector$<$ int $>$ \&umax)}{computeOrientation(const Mat &image, vector< KeyPoint > &keypoints, const vector< int > &umax)}}]{\setlength{\rightskip}{0pt plus 5cm}static void O\+R\+B\+\_\+\+S\+L\+A\+M2\+::compute\+Orientation (
+\begin{DoxyParamCaption}
+\item[{const Mat \&}]{image, }
+\item[{vector$<$ Key\+Point $>$ \&}]{keypoints, }
+\item[{const vector$<$ int $>$ \&}]{umax}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{namespaceORB__SLAM2_a40adb6b621d7c2dd9d2961ba88e445c8}{}\label{namespaceORB__SLAM2_a40adb6b621d7c2dd9d2961ba88e445c8}
+
+
+Definition at line 472 of file O\+R\+Bextractor.\+cc.
+
+
+\begin{DoxyCode}
+473 \{
+474     \textcolor{keywordflow}{for} (vector<KeyPoint>::iterator keypoint = keypoints.begin(),
+475          keypointEnd = keypoints.end(); keypoint != keypointEnd; ++keypoint)
+476     \{
+477         keypoint->angle = \hyperlink{namespaceORB__SLAM2_ac570dbdaae2d483745515b5022fd6820}{IC\_Angle}(image, keypoint->pt, umax);
+478     \}
+479 \}
+\end{DoxyCode}
+
+
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespaceORB__SLAM2_a40adb6b621d7c2dd9d2961ba88e445c8_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{O\+R\+B\+\_\+\+S\+L\+A\+M2@{O\+R\+B\+\_\+\+S\+L\+A\+M2}!I\+C\+\_\+\+Angle@{I\+C\+\_\+\+Angle}}
+\index{I\+C\+\_\+\+Angle@{I\+C\+\_\+\+Angle}!O\+R\+B\+\_\+\+S\+L\+A\+M2@{O\+R\+B\+\_\+\+S\+L\+A\+M2}}
+\subsubsection[{\texorpdfstring{I\+C\+\_\+\+Angle(const Mat \&image, Point2f pt, const vector$<$ int $>$ \&u\+\_\+max)}{IC_Angle(const Mat &image, Point2f pt, const vector< int > &u_max)}}]{\setlength{\rightskip}{0pt plus 5cm}static float O\+R\+B\+\_\+\+S\+L\+A\+M2\+::\+I\+C\+\_\+\+Angle (
+\begin{DoxyParamCaption}
+\item[{const Mat \&}]{image, }
+\item[{Point2f}]{pt, }
+\item[{const vector$<$ int $>$ \&}]{u\+\_\+max}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{namespaceORB__SLAM2_ac570dbdaae2d483745515b5022fd6820}{}\label{namespaceORB__SLAM2_ac570dbdaae2d483745515b5022fd6820}
+
+
+Definition at line 77 of file O\+R\+Bextractor.\+cc.
+
+
+\begin{DoxyCode}
+78 \{
+79     \textcolor{keywordtype}{int} m\_01 = 0, m\_10 = 0;
+80 
+81     \textcolor{keyword}{const} uchar* center = &image.at<uchar> (cvRound(pt.y), cvRound(pt.x));
+82 
+83     \textcolor{comment}{// Treat the center line differently, v=0}
+84     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} u = -\hyperlink{namespaceORB__SLAM2_aa09849ae679bf2392b097abd710d8d7f}{HALF\_PATCH\_SIZE}; u <= \hyperlink{namespaceORB__SLAM2_aa09849ae679bf2392b097abd710d8d7f}{HALF\_PATCH\_SIZE}; ++u)
+85         m\_10 += u * center[u];
+86 
+87     \textcolor{comment}{// Go line by line in the circuI853lar patch}
+88     \textcolor{keywordtype}{int} step = (int)image.step1();
+89     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} v = 1; v <= \hyperlink{namespaceORB__SLAM2_aa09849ae679bf2392b097abd710d8d7f}{HALF\_PATCH\_SIZE}; ++v)
+90     \{
+91         \textcolor{comment}{// Proceed over the two lines}
+92         \textcolor{keywordtype}{int} v\_sum = 0;
+93         \textcolor{keywordtype}{int} d = u\_max[v];
+94         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} u = -d; u <= d; ++u)
+95         \{
+96             \textcolor{keywordtype}{int} val\_plus = center[u + v*step], val\_minus = center[u - v*step];
+97             v\_sum += (val\_plus - val\_minus);
+98             m\_10 += u * (val\_plus + val\_minus);
+99         \}
+100         m\_01 += v * v\_sum;
+101     \}
+102 
+103     \textcolor{keywordflow}{return} fastAtan2((\textcolor{keywordtype}{float})m\_01, (\textcolor{keywordtype}{float})m\_10);
+104 \}
+\end{DoxyCode}
+
+
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespaceORB__SLAM2_ac570dbdaae2d483745515b5022fd6820_icgraph}
+\end{center}
+\end{figure}
+
+
+
+
+\subsection{Variable Documentation}
+\index{O\+R\+B\+\_\+\+S\+L\+A\+M2@{O\+R\+B\+\_\+\+S\+L\+A\+M2}!bit\+\_\+pattern\+\_\+31\+\_\+@{bit\+\_\+pattern\+\_\+31\+\_\+}}
+\index{bit\+\_\+pattern\+\_\+31\+\_\+@{bit\+\_\+pattern\+\_\+31\+\_\+}!O\+R\+B\+\_\+\+S\+L\+A\+M2@{O\+R\+B\+\_\+\+S\+L\+A\+M2}}
+\subsubsection[{\texorpdfstring{bit\+\_\+pattern\+\_\+31\+\_\+}{bit_pattern_31_}}]{\setlength{\rightskip}{0pt plus 5cm}int O\+R\+B\+\_\+\+S\+L\+A\+M2\+::bit\+\_\+pattern\+\_\+31\+\_\+\mbox{[}256 $\ast$4\mbox{]}\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{namespaceORB__SLAM2_a8dd21ee063eca2b0bc3f5e76ceba0492}{}\label{namespaceORB__SLAM2_a8dd21ee063eca2b0bc3f5e76ceba0492}
+
+
+Definition at line 150 of file O\+R\+Bextractor.\+cc.
+
+\index{O\+R\+B\+\_\+\+S\+L\+A\+M2@{O\+R\+B\+\_\+\+S\+L\+A\+M2}!E\+D\+G\+E\+\_\+\+T\+H\+R\+E\+S\+H\+O\+LD@{E\+D\+G\+E\+\_\+\+T\+H\+R\+E\+S\+H\+O\+LD}}
+\index{E\+D\+G\+E\+\_\+\+T\+H\+R\+E\+S\+H\+O\+LD@{E\+D\+G\+E\+\_\+\+T\+H\+R\+E\+S\+H\+O\+LD}!O\+R\+B\+\_\+\+S\+L\+A\+M2@{O\+R\+B\+\_\+\+S\+L\+A\+M2}}
+\subsubsection[{\texorpdfstring{E\+D\+G\+E\+\_\+\+T\+H\+R\+E\+S\+H\+O\+LD}{EDGE_THRESHOLD}}]{\setlength{\rightskip}{0pt plus 5cm}const int O\+R\+B\+\_\+\+S\+L\+A\+M2\+::\+E\+D\+G\+E\+\_\+\+T\+H\+R\+E\+S\+H\+O\+LD = 19}\hypertarget{namespaceORB__SLAM2_aec00f1ad4dea35755e3af4404282cd3b}{}\label{namespaceORB__SLAM2_aec00f1ad4dea35755e3af4404282cd3b}
+
+
+Definition at line 74 of file O\+R\+Bextractor.\+cc.
+
+\index{O\+R\+B\+\_\+\+S\+L\+A\+M2@{O\+R\+B\+\_\+\+S\+L\+A\+M2}!factor\+PI@{factor\+PI}}
+\index{factor\+PI@{factor\+PI}!O\+R\+B\+\_\+\+S\+L\+A\+M2@{O\+R\+B\+\_\+\+S\+L\+A\+M2}}
+\subsubsection[{\texorpdfstring{factor\+PI}{factorPI}}]{\setlength{\rightskip}{0pt plus 5cm}const float O\+R\+B\+\_\+\+S\+L\+A\+M2\+::factor\+PI = (float)(C\+V\+\_\+\+PI/180.f)}\hypertarget{namespaceORB__SLAM2_a8015b470ffeb885a0c90837a03b3210f}{}\label{namespaceORB__SLAM2_a8015b470ffeb885a0c90837a03b3210f}
+
+
+Definition at line 107 of file O\+R\+Bextractor.\+cc.
+
+\index{O\+R\+B\+\_\+\+S\+L\+A\+M2@{O\+R\+B\+\_\+\+S\+L\+A\+M2}!H\+A\+L\+F\+\_\+\+P\+A\+T\+C\+H\+\_\+\+S\+I\+ZE@{H\+A\+L\+F\+\_\+\+P\+A\+T\+C\+H\+\_\+\+S\+I\+ZE}}
+\index{H\+A\+L\+F\+\_\+\+P\+A\+T\+C\+H\+\_\+\+S\+I\+ZE@{H\+A\+L\+F\+\_\+\+P\+A\+T\+C\+H\+\_\+\+S\+I\+ZE}!O\+R\+B\+\_\+\+S\+L\+A\+M2@{O\+R\+B\+\_\+\+S\+L\+A\+M2}}
+\subsubsection[{\texorpdfstring{H\+A\+L\+F\+\_\+\+P\+A\+T\+C\+H\+\_\+\+S\+I\+ZE}{HALF_PATCH_SIZE}}]{\setlength{\rightskip}{0pt plus 5cm}const int O\+R\+B\+\_\+\+S\+L\+A\+M2\+::\+H\+A\+L\+F\+\_\+\+P\+A\+T\+C\+H\+\_\+\+S\+I\+ZE = 15}\hypertarget{namespaceORB__SLAM2_aa09849ae679bf2392b097abd710d8d7f}{}\label{namespaceORB__SLAM2_aa09849ae679bf2392b097abd710d8d7f}
+
+
+Definition at line 73 of file O\+R\+Bextractor.\+cc.
+
+\index{O\+R\+B\+\_\+\+S\+L\+A\+M2@{O\+R\+B\+\_\+\+S\+L\+A\+M2}!P\+A\+T\+C\+H\+\_\+\+S\+I\+ZE@{P\+A\+T\+C\+H\+\_\+\+S\+I\+ZE}}
+\index{P\+A\+T\+C\+H\+\_\+\+S\+I\+ZE@{P\+A\+T\+C\+H\+\_\+\+S\+I\+ZE}!O\+R\+B\+\_\+\+S\+L\+A\+M2@{O\+R\+B\+\_\+\+S\+L\+A\+M2}}
+\subsubsection[{\texorpdfstring{P\+A\+T\+C\+H\+\_\+\+S\+I\+ZE}{PATCH_SIZE}}]{\setlength{\rightskip}{0pt plus 5cm}const int O\+R\+B\+\_\+\+S\+L\+A\+M2\+::\+P\+A\+T\+C\+H\+\_\+\+S\+I\+ZE = 31}\hypertarget{namespaceORB__SLAM2_a557e5c298c5f7164667f083494c2197a}{}\label{namespaceORB__SLAM2_a557e5c298c5f7164667f083494c2197a}
+
+
+Definition at line 72 of file O\+R\+Bextractor.\+cc.
+

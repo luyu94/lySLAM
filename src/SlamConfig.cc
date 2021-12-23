@@ -34,22 +34,14 @@ Config::~Config()
 void Config::createSavePath(const std::string dir)
 {
     LOG(INFO) << "Create save path: " << dir;
-
-    LOG(INFO) << "step 0";
-
     config_->root_save_path_ = dir;
-
-    LOG(INFO) << "step 1";
 
     std::string str = dir;
     config_->createDirectory(str); // root directory
 
-    LOG(INFO) << "step 2";
-
     str = dir + "/rgb/";
     config_->createDirectory(str);
 
-    LOG(INFO) << "step 3";
 
     str = dir + "/depth/";
     config_->createDirectory(str);
@@ -71,8 +63,6 @@ void Config::createSavePath(const std::string dir)
 
     str = dir + "/score/";
     config_->createDirectory(str);
-
-    LOG(INFO) << "step 4";
 }
 
 void Config::createDirectory(const std::string dir)

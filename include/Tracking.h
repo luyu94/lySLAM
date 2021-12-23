@@ -106,6 +106,7 @@ public:
     Frame* mpCurrentFrame;
     // void SemanticTracking(Frame* lastFrame, Frame* currentFrame);
 
+
     //==============================Semantic==============================
     // void SemanticTracking(KeyFrame* lastKF, KeyFrame* currentFrame);
     void PoseOptimization(KeyFrame* currentKF, bool bUpdateMap);
@@ -114,9 +115,6 @@ public:
     void PredictFeatureProbability(KeyFrame* lastKF, KeyFrame* curKF);
     // void PredictMovingProbability(KeyFrame* lastKF, Frame* curKF);
     void PredictSemanticMask(KeyFrame* lastKF, KeyFrame* currentKF);
-
-
-
 
     // Initialization Variables (Monocular)
     std::vector<int> mvIniLastMatches;

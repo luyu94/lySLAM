@@ -1,0 +1,81 @@
+\hypertarget{classlySLAM_1_1PyEnsureGIL}{}\section{ly\+S\+L\+AM\+:\+:Py\+Ensure\+G\+IL Class Reference}
+\label{classlySLAM_1_1PyEnsureGIL}\index{ly\+S\+L\+A\+M\+::\+Py\+Ensure\+G\+IL@{ly\+S\+L\+A\+M\+::\+Py\+Ensure\+G\+IL}}
+
+
+Collaboration diagram for ly\+S\+L\+AM\+:\+:Py\+Ensure\+G\+IL\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=196pt]{classlySLAM_1_1PyEnsureGIL__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classlySLAM_1_1PyEnsureGIL_a1b7f914c64f03eaf053e2854925d620a}{Py\+Ensure\+G\+IL} ()
+\item 
+\hyperlink{classlySLAM_1_1PyEnsureGIL_a39bb4f6f02bbd598d89819ddd2b90529}{$\sim$\+Py\+Ensure\+G\+IL} ()
+\end{DoxyCompactItemize}
+\subsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+Py\+G\+I\+L\+State\+\_\+\+S\+T\+A\+TE \hyperlink{classlySLAM_1_1PyEnsureGIL_ade2080afcd63201ae95bb0eb5bfd3696}{\+\_\+state}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+
+
+Definition at line 46 of file Conversion.\+cc.
+
+
+
+\subsection{Constructor \& Destructor Documentation}
+\index{ly\+S\+L\+A\+M\+::\+Py\+Ensure\+G\+IL@{ly\+S\+L\+A\+M\+::\+Py\+Ensure\+G\+IL}!Py\+Ensure\+G\+IL@{Py\+Ensure\+G\+IL}}
+\index{Py\+Ensure\+G\+IL@{Py\+Ensure\+G\+IL}!ly\+S\+L\+A\+M\+::\+Py\+Ensure\+G\+IL@{ly\+S\+L\+A\+M\+::\+Py\+Ensure\+G\+IL}}
+\subsubsection[{\texorpdfstring{Py\+Ensure\+G\+I\+L()}{PyEnsureGIL()}}]{\setlength{\rightskip}{0pt plus 5cm}ly\+S\+L\+A\+M\+::\+Py\+Ensure\+G\+I\+L\+::\+Py\+Ensure\+G\+IL (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classlySLAM_1_1PyEnsureGIL_a1b7f914c64f03eaf053e2854925d620a}{}\label{classlySLAM_1_1PyEnsureGIL_a1b7f914c64f03eaf053e2854925d620a}
+
+
+Definition at line 49 of file Conversion.\+cc.
+
+
+\begin{DoxyCode}
+49 : \hyperlink{classlySLAM_1_1PyEnsureGIL_ade2080afcd63201ae95bb0eb5bfd3696}{\_state}(PyGILState\_Ensure()) \{\}
+\end{DoxyCode}
+\index{ly\+S\+L\+A\+M\+::\+Py\+Ensure\+G\+IL@{ly\+S\+L\+A\+M\+::\+Py\+Ensure\+G\+IL}!````~Py\+Ensure\+G\+IL@{$\sim$\+Py\+Ensure\+G\+IL}}
+\index{````~Py\+Ensure\+G\+IL@{$\sim$\+Py\+Ensure\+G\+IL}!ly\+S\+L\+A\+M\+::\+Py\+Ensure\+G\+IL@{ly\+S\+L\+A\+M\+::\+Py\+Ensure\+G\+IL}}
+\subsubsection[{\texorpdfstring{$\sim$\+Py\+Ensure\+G\+I\+L()}{~PyEnsureGIL()}}]{\setlength{\rightskip}{0pt plus 5cm}ly\+S\+L\+A\+M\+::\+Py\+Ensure\+G\+I\+L\+::$\sim$\+Py\+Ensure\+G\+IL (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classlySLAM_1_1PyEnsureGIL_a39bb4f6f02bbd598d89819ddd2b90529}{}\label{classlySLAM_1_1PyEnsureGIL_a39bb4f6f02bbd598d89819ddd2b90529}
+
+
+Definition at line 50 of file Conversion.\+cc.
+
+
+\begin{DoxyCode}
+51     \{
+52         std::cout << \textcolor{stringliteral}{"releasing"}<< std::endl;
+53         PyGILState\_Release(\hyperlink{classlySLAM_1_1PyEnsureGIL_ade2080afcd63201ae95bb0eb5bfd3696}{\_state});
+54     \}
+\end{DoxyCode}
+
+
+\subsection{Member Data Documentation}
+\index{ly\+S\+L\+A\+M\+::\+Py\+Ensure\+G\+IL@{ly\+S\+L\+A\+M\+::\+Py\+Ensure\+G\+IL}!\+\_\+state@{\+\_\+state}}
+\index{\+\_\+state@{\+\_\+state}!ly\+S\+L\+A\+M\+::\+Py\+Ensure\+G\+IL@{ly\+S\+L\+A\+M\+::\+Py\+Ensure\+G\+IL}}
+\subsubsection[{\texorpdfstring{\+\_\+state}{_state}}]{\setlength{\rightskip}{0pt plus 5cm}Py\+G\+I\+L\+State\+\_\+\+S\+T\+A\+TE ly\+S\+L\+A\+M\+::\+Py\+Ensure\+G\+I\+L\+::\+\_\+state\hspace{0.3cm}{\ttfamily [private]}}\hypertarget{classlySLAM_1_1PyEnsureGIL_ade2080afcd63201ae95bb0eb5bfd3696}{}\label{classlySLAM_1_1PyEnsureGIL_ade2080afcd63201ae95bb0eb5bfd3696}
+
+
+Definition at line 56 of file Conversion.\+cc.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{Conversion_8cc}{Conversion.\+cc}\end{DoxyCompactItemize}

@@ -32,7 +32,7 @@ void LoadImages(const string &strAssociationFilename, vector<string> &vstrImageF
 int main(int argc, char *argv[])
 {
     //FLAGS_log_dir = "/mnt/lySLAM/GLOG";
-    google::InitGoogleLogging(argv[0]);
+    //google::InitGoogleLogging(argv[0]);
 
     if(argc < 5 )
     {
@@ -47,14 +47,14 @@ int main(int argc, char *argv[])
     std::cout << "argv[4] path_to_association: " << argv[4] << std::endl;
     std::cout << "argv[5] result path: " << argv[5] << std::endl;
 
-    LOG(INFO) << "---------Parameters---------------";
-    LOG(INFO) << "argv[1]: " << argv[1];
-    LOG(INFO) << "argv[2]: " << argv[2];
-    LOG(INFO) << "argv[3]: " << argv[3];
+    // LOG(INFO) << "---------Parameters---------------";
+    // LOG(INFO) << "argv[1]: " << argv[1];
+    // LOG(INFO) << "argv[2]: " << argv[2];
+    // LOG(INFO) << "argv[3]: " << argv[3];
 
-    LOG(INFO) << "argv[4]: " << argv[4];
-    LOG(INFO) << "argv[5] result path: " << argv[5];
-    LOG(INFO) << "----------------------------------";
+    // LOG(INFO) << "argv[4]: " << argv[4];
+    // LOG(INFO) << "argv[5] result path: " << argv[5];
+    // LOG(INFO) << "----------------------------------";
     std::cout << "===========================" << std::endl;
 
     // save result
@@ -101,14 +101,15 @@ int main(int argc, char *argv[])
     //nh.getParam("init_delay", init_delay);
     //nh.getParam("frame_delay", frame_delay);
     //nh.getParam("init_frames", init_frames);
-
     LOG(INFO) << "Delay for the initial few frames: " << init_delay;
+    //cout << "Delay for the initial few frames: " << init_delay << endl;
 
     Semantic::GetInstance()->SetSemanticMethod(cnn_method);
 
     // Create SLAM system. It initializes all system threads and gets ready to process frames.
     ORB_SLAM2::System SLAM(argv[1],argv[2],ORB_SLAM2::System::RGBD, false);
 
+    // 运行语义线程
     Semantic::GetInstance()->Run();
 
     // Vector for tracking time statistics
@@ -161,11 +162,12 @@ int main(int argc, char *argv[])
             usleep((T-ttrack)*1e6);
     }
 
-    LOG(INFO) << "===============Tracking Finished============";
     std::cout << "===============Tracking Finished============" << std::endl;
 
-    LOG(INFO) << "===============Final Stage============";
     std::cout << "===============Final Stage============" << std::endl;
+
+    // Stop semantic thread
+    Semantic::GetInstance()->RequestFinish();
 
     // Stop all threads
     SLAM.Shutdown();
@@ -178,12 +180,9 @@ int main(int argc, char *argv[])
         totaltime+=vTimesTrack[ni];
     }
     cout << "-------" << endl << endl;
-    cout << "median tracking time: " << vTimesTrack[nImages/2] << endl;
-    LOG(INFO) << "median tracking time: " << vTimesTrack[nImages / 2] * 1000 << "ms";
-    cout << "mean tracking time: " << totaltime/nImages << endl;
-    LOG(INFO) << "mean tracking time: " << totaltime / nImages * 1000 << "ms";
+    cout << "------median tracking time: " << vTimesTrack[nImages/2] << endl;
+    cout << "------mean tracking time: " << totaltime/nImages << endl;
 
-    google::ShutdownGoogleLogging();
 
     // Save camera trajectory
     SLAM.SaveTrajectoryTUM("CameraTrajectory.txt");

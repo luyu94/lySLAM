@@ -1,0 +1,431 @@
+===========================
+argv[1] path_to_vocabulary: Vocabulary/ORBvoc.txt
+argv[2] path_to_settings: Examples/RGB-D/TUM3.yaml
+argv[3] path_to_sequence: /mnt/data/rgbd_dataset_freiburg3_walking_rpy
+argv[4] path_to_association: /mnt/lySLAM/Examples/RGB-D/associations/test.txt
+argv[5] result path: /mnt/2data
+===========================
+WARNING: Logging before InitGoogleLogging() is written to STDERR
+I1223 14:07:17.135771 40298 SlamConfig.cc:14] IsSaveResult:1
+I1223 14:07:17.136099 40298 SlamConfig.cc:36] Create save path: /mnt/2data
+nImages: 50
+I1223 14:07:17.139660 40298 rgbd_tum_optical.cc:104] Delay for the initial few frames: 0.05
+I1223 14:07:17.140096 40298 Semantic.cc:44] ======Create Semantic instance and start new thread
+I1223 14:07:17.140187 40298 Semantic.cc:460] Use CNN method: maskrcnn
+Use CNN method: maskrcnn
+
+DynaSLAM Copyright (C) 2018 Berta Bescos, University of Zaragoza.
+
+Input sensor was set to: RGB-D
+
+Loading ORB Vocabulary. This could take a while...
+Vocabulary loaded!
+
+
+Camera Parameters: 
+- fx: 535.4
+- fy: 539.2
+- cx: 320.1
+- cy: 247.6
+- k1: 0
+- k2: 0
+- p1: 0
+- p2: 0
+- fps: 30
+- color order: RGB (ignored if grayscale)
+
+ORB Extractor Parameters: 
+- Number of Features: 3000
+- Scale Levels: 8
+- Scale Factor: 1.2
+- Initial Fast Threshold: 20
+- Minimum Fast Threshold: 7
+
+Depth Threshold (Close/Far Points): 2.98842
+I1223 14:07:30.293920 40348 Semantic.cc:66] ========Start Semantic tracking thread=======
+I1223 14:07:30.293949 40347 Semantic.cc:146] =======Start Semantic Segmentation thread======
+I1223 14:07:30.294210 40347 Semantic.cc:150] ------Loading Mask R-CNN. This could take a while...
+I1223 14:07:30.294317 40347 MaskNet.cc:33] ------Importing Mask R-CNN Settings...
+I1223 14:07:30.295960 40347 MaskNet.cc:139] ------py_path: /mnt/lySLAM/src/python/
+I1223 14:07:30.296108 40347 MaskNet.cc:140] ------module_name: MaskRCNN
+I1223 14:07:30.296192 40347 MaskNet.cc:141] ------class_name: Mask
+I1223 14:07:30.296304 40347 MaskNet.cc:142] ------get_dyn_seg: GetDynSeg
+I1223 14:07:30.329007 40347 MaskNet.cc:40] ------python 初始化，导入模型等，进行语义分割
+I1223 14:07:30.420423 40298 Tracking.cc:287] =======Start Track!
+New map created with 2093 points
+I1223 14:07:30.510715 40298 Tracking.cc:664] New map created with 2093 points
+I1223 14:07:30.647581 40298 Tracking.cc:287] =======Start Track!
+I1223 14:07:31.028023 40298 ORBmatcher.cc:185] ------Num of GoodMapPoints matched: 0
+I1223 14:07:31.028952 40298 ORBmatcher.cc:198] ------Total Num of matched: 849
+I1223 14:07:31.942868 40298 Tracking.cc:287] =======Start Track!
+I1223 14:07:31.971469 40298 ORBmatcher.cc:1603] ******Num of SizeGoodMapPoints matched: 0
+I1223 14:07:31.972645 40298 ORBmatcher.cc:1614] ******Total Num of SizeGoodMapPoints matched: 866
+Using TensorFlow backend.
+I1223 14:07:32.480120 40298 ORBmatcher.cc:185] ------Num of GoodMapPoints matched: 0
+I1223 14:07:32.480867 40298 ORBmatcher.cc:198] ------Total Num of matched: 545
+I1223 14:07:33.210412 40298 Tracking.cc:287] =======Start Track!
+I1223 14:07:33.256494 40298 ORBmatcher.cc:1603] ******Num of SizeGoodMapPoints matched: 0
+I1223 14:07:33.257580 40298 ORBmatcher.cc:1614] ******Total Num of SizeGoodMapPoints matched: 1266
+I1223 14:07:34.188832 40298 ORBmatcher.cc:185] ------Num of GoodMapPoints matched: 0
+I1223 14:07:34.189601 40298 ORBmatcher.cc:198] ------Total Num of matched: 603
+I1223 14:07:35.018332 40298 Tracking.cc:287] =======Start Track!
+I1223 14:07:35.064185 40298 ORBmatcher.cc:1603] ******Num of SizeGoodMapPoints matched: 0
+I1223 14:07:35.065342 40298 ORBmatcher.cc:1614] ******Total Num of SizeGoodMapPoints matched: 1217
+I1223 14:07:35.724373 40298 ORBmatcher.cc:185] ------Num of GoodMapPoints matched: 0
+I1223 14:07:35.725119 40298 ORBmatcher.cc:198] ------Total Num of matched: 601
+I1223 14:07:36.435003 40298 Tracking.cc:287] =======Start Track!
+I1223 14:07:36.461988 40298 ORBmatcher.cc:1603] ******Num of SizeGoodMapPoints matched: 0
+I1223 14:07:36.462750 40298 ORBmatcher.cc:1614] ******Total Num of SizeGoodMapPoints matched: 806
+WARNING:tensorflow:From /usr/local/lib/python2.7/dist-packages/keras/backend/tensorflow_backend.py:1154: calling reduce_max (from tensorflow.python.ops.math_ops) with keep_dims is deprecated and will be removed in a future version.
+Instructions for updating:
+keep_dims is deprecated, use keepdims instead
+WARNING:tensorflow:From /usr/local/lib/python2.7/dist-packages/keras/backend/tensorflow_backend.py:1188: calling reduce_sum (from tensorflow.python.ops.math_ops) with keep_dims is deprecated and will be removed in a future version.
+Instructions for updating:
+keep_dims is deprecated, use keepdims instead
+I1223 14:07:36.927975 40298 ORBmatcher.cc:185] ------Num of GoodMapPoints matched: 0
+I1223 14:07:36.928870 40298 ORBmatcher.cc:198] ------Total Num of matched: 823
+I1223 14:07:37.698891 40298 Tracking.cc:287] =======Start Track!
+I1223 14:07:37.720726 40298 ORBmatcher.cc:1603] ******Num of SizeGoodMapPoints matched: 0
+I1223 14:07:37.721448 40298 ORBmatcher.cc:1614] ******Total Num of SizeGoodMapPoints matched: 682
+I1223 14:07:38.095464 40298 ORBmatcher.cc:185] ------Num of GoodMapPoints matched: 0
+I1223 14:07:38.096297 40298 ORBmatcher.cc:198] ------Total Num of matched: 764
+I1223 14:07:38.815100 40298 Tracking.cc:287] =======Start Track!
+I1223 14:07:38.855264 40298 ORBmatcher.cc:1603] ******Num of SizeGoodMapPoints matched: 0
+I1223 14:07:38.856382 40298 ORBmatcher.cc:1614] ******Total Num of SizeGoodMapPoints matched: 1142
+I1223 14:07:39.487344 40298 ORBmatcher.cc:185] ------Num of GoodMapPoints matched: 0
+I1223 14:07:39.488027 40298 ORBmatcher.cc:198] ------Total Num of matched: 612
+I1223 14:07:40.233621 40298 Tracking.cc:287] =======Start Track!
+I1223 14:07:40.259404 40298 ORBmatcher.cc:1603] ******Num of SizeGoodMapPoints matched: 0
+I1223 14:07:40.260133 40298 ORBmatcher.cc:1614] ******Total Num of SizeGoodMapPoints matched: 755
+I1223 14:07:40.748399 40298 ORBmatcher.cc:185] ------Num of GoodMapPoints matched: 0
+I1223 14:07:40.749356 40298 ORBmatcher.cc:198] ------Total Num of matched: 781
+I1223 14:07:41.417755 40298 Tracking.cc:287] =======Start Track!
+I1223 14:07:41.438398 40298 ORBmatcher.cc:1603] ******Num of SizeGoodMapPoints matched: 0
+I1223 14:07:41.439002 40298 ORBmatcher.cc:1614] ******Total Num of SizeGoodMapPoints matched: 632
+2021-12-23 14:07:41.749553: I tensorflow/core/platform/cpu_feature_guard.cc:141] Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2 FMA
+I1223 14:07:41.805927 40298 ORBmatcher.cc:185] ------Num of GoodMapPoints matched: 0
+I1223 14:07:41.806674 40298 ORBmatcher.cc:198] ------Total Num of matched: 745
+2021-12-23 14:07:41.998485: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1432] Found device 0 with properties: 
+name: NVIDIA GeForce RTX 2080 Ti major: 7 minor: 5 memoryClockRate(GHz): 1.545
+pciBusID: 0000:88:00.0
+totalMemory: 10.76GiB freeMemory: 10.61GiB
+2021-12-23 14:07:41.998827: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1511] Adding visible gpu devices: 0
+2021-12-23 14:07:42.452403: I tensorflow/core/common_runtime/gpu/gpu_device.cc:982] Device interconnect StreamExecutor with strength 1 edge matrix:
+2021-12-23 14:07:42.452708: I tensorflow/core/common_runtime/gpu/gpu_device.cc:988]      0 
+2021-12-23 14:07:42.452828: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1001] 0:   N 
+2021-12-23 14:07:42.453074: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1115] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 10241 MB memory) -> physical GPU (device: 0, name: NVIDIA GeForce RTX 2080 Ti, pci bus id: 0000:88:00.0, compute capability: 7.5)
+I1223 14:07:42.469830 40298 Tracking.cc:287] =======Start Track!
+I1223 14:07:42.487249 40298 ORBmatcher.cc:1603] ******Num of SizeGoodMapPoints matched: 0
+I1223 14:07:42.487886 40298 ORBmatcher.cc:1614] ******Total Num of SizeGoodMapPoints matched: 548
+I1223 14:07:42.910200 40298 ORBmatcher.cc:185] ------Num of GoodMapPoints matched: 0
+I1223 14:07:42.910956 40298 ORBmatcher.cc:198] ------Total Num of matched: 713
+I1223 14:07:43.531742 40298 Tracking.cc:287] =======Start Track!
+I1223 14:07:43.572747 40298 ORBmatcher.cc:1603] ******Num of SizeGoodMapPoints matched: 0
+I1223 14:07:43.574237 40298 ORBmatcher.cc:1614] ******Total Num of SizeGoodMapPoints matched: 1134
+I1223 14:07:44.275781 40298 ORBmatcher.cc:185] ------Num of GoodMapPoints matched: 0
+I1223 14:07:44.276652 40298 ORBmatcher.cc:198] ------Total Num of matched: 642
+I1223 14:07:45.042340 40347 MaskNet.cc:62] ------Creating net instance...
+I1223 14:07:45.042644 40347 MaskNet.cc:64] ------Loading net parameters...
+I1223 14:07:45.042815 40347 Semantic.cc:152] ------Mask R-CNN loaded!
+I1223 14:07:45.085865 40298 Tracking.cc:287] =======Start Track!
+I1223 14:07:45.109853 40298 ORBmatcher.cc:1603] ******Num of SizeGoodMapPoints matched: 0
+I1223 14:07:45.110513 40298 ORBmatcher.cc:1614] ******Total Num of SizeGoodMapPoints matched: 740
+I1223 14:07:45.143002 40347 Semantic.cc:168] ==============================
+I1223 14:07:45.143182 40347 Semantic.cc:201] ========调用关键的语义分割函数=========
+I1223 14:07:45.143362 40347 MaskNet.cc:106] ---------------------
+I1223 14:07:45.143458 40347 MaskNet.cc:116] ------图片变换格式--------
+I1223 14:07:45.144460 40347 MaskNet.cc:119] ------语义分割开始调用python程序--------
+I1223 14:07:45.587704 40298 ORBmatcher.cc:185] ------Num of GoodMapPoints matched: 0
+I1223 14:07:45.588734 40298 ORBmatcher.cc:198] ------Total Num of matched: 763
+I1223 14:07:46.257069 40298 Tracking.cc:287] =======Start Track!
+I1223 14:07:46.278121 40298 ORBmatcher.cc:1603] ******Num of SizeGoodMapPoints matched: 0
+I1223 14:07:46.278816 40298 ORBmatcher.cc:1614] ******Total Num of SizeGoodMapPoints matched: 584
+I1223 14:07:46.668931 40298 ORBmatcher.cc:185] ------Num of GoodMapPoints matched: 0
+I1223 14:07:46.669934 40298 ORBmatcher.cc:198] ------Total Num of matched: 809
+I1223 14:07:47.295811 40298 Tracking.cc:287] =======Start Track!
+I1223 14:07:47.312177 40298 ORBmatcher.cc:1603] ******Num of SizeGoodMapPoints matched: 0
+I1223 14:07:47.312749 40298 ORBmatcher.cc:1614] ******Total Num of SizeGoodMapPoints matched: 493
+I1223 14:07:47.680884 40298 ORBmatcher.cc:185] ------Num of GoodMapPoints matched: 0
+I1223 14:07:47.682008 40298 ORBmatcher.cc:198] ------Total Num of matched: 788
+I1223 14:07:48.321209 40298 Tracking.cc:287] =======Start Track!
+I1223 14:07:48.362347 40298 ORBmatcher.cc:1603] ******Num of SizeGoodMapPoints matched: 0
+I1223 14:07:48.363691 40298 ORBmatcher.cc:1614] ******Total Num of SizeGoodMapPoints matched: 1148
+I1223 14:07:48.959460 40298 ORBmatcher.cc:185] ------Num of GoodMapPoints matched: 0
+I1223 14:07:48.960304 40298 ORBmatcher.cc:198] ------Total Num of matched: 738
+I1223 14:07:49.700184 40298 Tracking.cc:287] =======Start Track!
+I1223 14:07:49.726642 40298 ORBmatcher.cc:1603] ******Num of SizeGoodMapPoints matched: 0
+I1223 14:07:49.727308 40298 ORBmatcher.cc:1614] ******Total Num of SizeGoodMapPoints matched: 744
+I1223 14:07:50.130661 40347 MaskNet.cc:121] ------语义分割调用python程序成功--------
+I1223 14:07:50.131615 40347 MaskNet.cc:116] ------图片变换格式--------
+I1223 14:07:50.132426 40347 MaskNet.cc:119] ------语义分割开始调用python程序--------
+I1223 14:07:50.167273 40298 ORBmatcher.cc:185] ------Num of GoodMapPoints matched: 0
+I1223 14:07:50.168471 40298 ORBmatcher.cc:198] ------Total Num of matched: 905
+I1223 14:07:50.312659 40347 MaskNet.cc:121] ------语义分割调用python程序成功--------
+I1223 14:07:50.313817 40347 MaskNet.cc:116] ------图片变换格式--------
+I1223 14:07:50.314612 40347 MaskNet.cc:119] ------语义分割开始调用python程序--------
+I1223 14:07:50.491053 40347 MaskNet.cc:121] ------语义分割调用python程序成功--------
+I1223 14:07:50.492069 40347 MaskNet.cc:116] ------图片变换格式--------
+I1223 14:07:50.492873 40347 MaskNet.cc:119] ------语义分割开始调用python程序--------
+I1223 14:07:50.667307 40347 MaskNet.cc:121] ------语义分割调用python程序成功--------
+I1223 14:07:50.668241 40347 Semantic.cc:203] ========语义分割结束=========
+I1223 14:07:50.668615 40347 Semantic.cc:481] -------Generate Mask for Frame: 1
+I1223 14:07:50.677639 40347 Semantic.cc:512] ========Time to update moving probability:  8.87195 ms
+I1223 14:07:50.788192 40347 Semantic.cc:481] -------Generate Mask for Frame: 2
+I1223 14:07:50.800860 40347 Semantic.cc:512] ========Time to update moving probability:  12.399 ms
+I1223 14:07:50.803767 40298 Tracking.cc:287] =======Start Track!
+I1223 14:07:50.824828 40298 ORBmatcher.cc:1603] ******Num of SizeGoodMapPoints matched: 144
+I1223 14:07:50.824971 40298 ORBmatcher.cc:1614] ******Total Num of SizeGoodMapPoints matched: 144
+I1223 14:07:50.915374 40347 Semantic.cc:481] -------Generate Mask for Frame: 3
+I1223 14:07:50.927310 40347 Semantic.cc:512] ========Time to update moving probability:  11.7604 ms
+I1223 14:07:51.017513 40298 ORBmatcher.cc:185] ------Num of GoodMapPoints matched: 159
+I1223 14:07:51.017640 40298 ORBmatcher.cc:198] ------Total Num of matched: 159
+I1223 14:07:51.036602 40347 Semantic.cc:481] -------Generate Mask for Frame: 4
+I1223 14:07:51.052474 40347 Semantic.cc:512] ========Time to update moving probability:  15.7452 ms
+Initializing Mask RCNN network...
+/mnt/lySLAM/src/python
+Initialated Mask RCNN network...
+=========Size of semantic queue: 5
+I1223 14:07:51.203692 40347 Semantic.cc:168] ==============================
+I1223 14:07:51.203866 40347 Semantic.cc:201] ========调用关键的语义分割函数=========
+I1223 14:07:51.203959 40347 MaskNet.cc:106] ---------------------
+I1223 14:07:51.204087 40347 MaskNet.cc:116] ------图片变换格式--------
+----------Size of semantic optimization queue: 2
+----------Size of semantic optimization queue: 1
+I1223 14:07:51.204896 40347 MaskNet.cc:119] ------语义分割开始调用python程序--------
+I1223 14:07:51.204958 40348 Semantic.cc:105] ------Optimize KF currentKF->mnId: 3
+I1223 14:07:51.205145 40348 Semantic.cc:108] ======keyframe Pose Optimization
+I1223 14:07:51.275207 40298 Tracking.cc:287] =======Start Track!
+I1223 14:07:51.279734 40298 ORBmatcher.cc:1603] ******Num of SizeGoodMapPoints matched: 122
+I1223 14:07:51.279862 40298 ORBmatcher.cc:1614] ******Total Num of SizeGoodMapPoints matched: 122
+I1223 14:07:51.387427 40347 MaskNet.cc:121] ------语义分割调用python程序成功--------
+I1223 14:07:51.388434 40347 Semantic.cc:203] ========语义分割结束=========
+I1223 14:07:51.388586 40347 Semantic.cc:481] -------Generate Mask for Frame: 5
+I1223 14:07:51.398572 40347 Semantic.cc:512] ========Time to update moving probability:  9.88774 ms
+I1223 14:07:51.465667 40298 ORBmatcher.cc:185] ------Num of GoodMapPoints matched: 277
+I1223 14:07:51.465819 40298 ORBmatcher.cc:198] ------Total Num of matched: 277
+=========Size of semantic queue: 3
+I1223 14:07:51.512473 40347 Semantic.cc:168] ==============================
+I1223 14:07:51.512569 40347 Semantic.cc:201] ========调用关键的语义分割函数=========
+I1223 14:07:51.512670 40347 MaskNet.cc:106] ---------------------
+E1223 14:07:51.512809 40347 MaskNet.cc:109] No image data
+I1223 14:07:51.512959 40347 Semantic.cc:203] ========语义分割结束=========
+=========Size of semantic queue: 0
+----------Size of semantic optimization queue: 3
+----------Size of semantic optimization queue: 2
+I1223 14:07:51.513510 40348 Semantic.cc:105] ------Optimize KF currentKF->mnId: 5
+I1223 14:07:51.513621 40348 Semantic.cc:108] ======keyframe Pose Optimization
+----------Size of semantic optimization queue: 1
+I1223 14:07:51.656054 40348 Semantic.cc:105] ------Optimize KF currentKF->mnId: 4
+I1223 14:07:51.656213 40348 Semantic.cc:108] ======keyframe Pose Optimization
+I1223 14:07:51.810972 40298 Tracking.cc:287] =======Start Track!
+I1223 14:07:51.817309 40298 ORBmatcher.cc:1603] ******Num of SizeGoodMapPoints matched: 172
+I1223 14:07:51.817466 40298 ORBmatcher.cc:1614] ******Total Num of SizeGoodMapPoints matched: 172
+I1223 14:07:52.029587 40298 ORBmatcher.cc:185] ------Num of GoodMapPoints matched: 231
+I1223 14:07:52.029795 40298 ORBmatcher.cc:198] ------Total Num of matched: 231
+I1223 14:07:52.354835 40298 Tracking.cc:287] =======Start Track!
+I1223 14:07:52.362030 40298 ORBmatcher.cc:1603] ******Num of SizeGoodMapPoints matched: 213
+I1223 14:07:52.362282 40298 ORBmatcher.cc:1614] ******Total Num of SizeGoodMapPoints matched: 213
+I1223 14:07:52.581583 40298 ORBmatcher.cc:185] ------Num of GoodMapPoints matched: 171
+I1223 14:07:52.581817 40298 ORBmatcher.cc:198] ------Total Num of matched: 171
+I1223 14:07:52.901739 40298 Tracking.cc:287] =======Start Track!
+I1223 14:07:52.908052 40298 ORBmatcher.cc:1603] ******Num of SizeGoodMapPoints matched: 185
+I1223 14:07:52.908182 40298 ORBmatcher.cc:1614] ******Total Num of SizeGoodMapPoints matched: 185
+I1223 14:07:53.140661 40298 ORBmatcher.cc:185] ------Num of GoodMapPoints matched: 188
+I1223 14:07:53.140944 40298 ORBmatcher.cc:198] ------Total Num of matched: 188
+I1223 14:07:53.503754 40298 Tracking.cc:287] =======Start Track!
+I1223 14:07:53.509891 40298 ORBmatcher.cc:1603] ******Num of SizeGoodMapPoints matched: 162
+I1223 14:07:53.510042 40298 ORBmatcher.cc:1614] ******Total Num of SizeGoodMapPoints matched: 162
+I1223 14:07:53.717566 40298 ORBmatcher.cc:185] ------Num of GoodMapPoints matched: 188
+I1223 14:07:53.717839 40298 ORBmatcher.cc:198] ------Total Num of matched: 188
+I1223 14:07:54.032863 40298 Tracking.cc:287] =======Start Track!
+I1223 14:07:54.038949 40298 ORBmatcher.cc:1603] ******Num of SizeGoodMapPoints matched: 180
+I1223 14:07:54.039083 40298 ORBmatcher.cc:1614] ******Total Num of SizeGoodMapPoints matched: 180
+I1223 14:07:54.271330 40298 ORBmatcher.cc:185] ------Num of GoodMapPoints matched: 196
+I1223 14:07:54.271574 40298 ORBmatcher.cc:198] ------Total Num of matched: 196
+I1223 14:07:54.625389 40298 Tracking.cc:287] =======Start Track!
+I1223 14:07:54.632347 40298 ORBmatcher.cc:1603] ******Num of SizeGoodMapPoints matched: 199
+I1223 14:07:54.632504 40298 ORBmatcher.cc:1614] ******Total Num of SizeGoodMapPoints matched: 199
+I1223 14:07:54.833684 40298 ORBmatcher.cc:185] ------Num of GoodMapPoints matched: 153
+I1223 14:07:54.833894 40298 ORBmatcher.cc:198] ------Total Num of matched: 153
+I1223 14:07:55.161968 40298 Tracking.cc:287] =======Start Track!
+I1223 14:07:55.250066 40298 ORBmatcher.cc:1603] ******Num of SizeGoodMapPoints matched: 134
+I1223 14:07:55.250254 40298 ORBmatcher.cc:1614] ******Total Num of SizeGoodMapPoints matched: 134
+I1223 14:07:55.485184 40298 ORBmatcher.cc:185] ------Num of GoodMapPoints matched: 145
+I1223 14:07:55.485368 40298 ORBmatcher.cc:198] ------Total Num of matched: 145
+I1223 14:07:55.800976 40298 Tracking.cc:287] =======Start Track!
+I1223 14:07:55.805620 40298 ORBmatcher.cc:1603] ******Num of SizeGoodMapPoints matched: 119
+I1223 14:07:55.805770 40298 ORBmatcher.cc:1614] ******Total Num of SizeGoodMapPoints matched: 119
+I1223 14:07:56.039027 40298 ORBmatcher.cc:185] ------Num of GoodMapPoints matched: 153
+I1223 14:07:56.039201 40298 ORBmatcher.cc:198] ------Total Num of matched: 153
+I1223 14:07:56.351780 40298 Tracking.cc:287] =======Start Track!
+I1223 14:07:56.357403 40298 ORBmatcher.cc:1603] ******Num of SizeGoodMapPoints matched: 142
+I1223 14:07:56.357486 40298 ORBmatcher.cc:1614] ******Total Num of SizeGoodMapPoints matched: 142
+I1223 14:07:56.579468 40298 ORBmatcher.cc:185] ------Num of GoodMapPoints matched: 118
+I1223 14:07:56.579716 40298 ORBmatcher.cc:198] ------Total Num of matched: 118
+I1223 14:07:56.759914 40347 Semantic.cc:168] ==============================
+I1223 14:07:56.760100 40347 Semantic.cc:201] ========调用关键的语义分割函数=========
+I1223 14:07:56.760243 40347 MaskNet.cc:106] ---------------------
+I1223 14:07:56.760398 40347 MaskNet.cc:116] ------图片变换格式--------
+I1223 14:07:56.760990 40347 MaskNet.cc:119] ------语义分割开始调用python程序--------
+I1223 14:07:56.932709 40298 Tracking.cc:287] =======Start Track!
+I1223 14:07:56.962538 40347 MaskNet.cc:121] ------语义分割调用python程序成功--------
+I1223 14:07:56.963981 40347 MaskNet.cc:116] ------图片变换格式--------
+I1223 14:07:56.964462 40347 MaskNet.cc:119] ------语义分割开始调用python程序--------
+I1223 14:07:56.993086 40298 ORBmatcher.cc:1603] ******Num of SizeGoodMapPoints matched: 103
+I1223 14:07:56.993309 40298 ORBmatcher.cc:1614] ******Total Num of SizeGoodMapPoints matched: 103
+I1223 14:07:57.161624 40347 MaskNet.cc:121] ------语义分割调用python程序成功--------
+I1223 14:07:57.162724 40347 Semantic.cc:203] ========语义分割结束=========
+I1223 14:07:57.162842 40347 Semantic.cc:481] -------Generate Mask for Frame: 6
+I1223 14:07:57.171353 40347 Semantic.cc:512] ========Time to update moving probability:  8.35347 ms
+I1223 14:07:57.233572 40298 ORBmatcher.cc:185] ------Num of GoodMapPoints matched: 146
+I1223 14:07:57.233731 40298 ORBmatcher.cc:198] ------Total Num of matched: 146
+I1223 14:07:57.322360 40347 Semantic.cc:481] -------Generate Mask for Frame: 7
+I1223 14:07:57.335057 40347 Semantic.cc:512] ========Time to update moving probability:  12.614 ms
+=========Size of semantic queue: 2
+I1223 14:07:57.496307 40347 Semantic.cc:168] ==============================
+I1223 14:07:57.496412 40347 Semantic.cc:201] ========调用关键的语义分割函数=========
+I1223 14:07:57.496516 40347 MaskNet.cc:106] ---------------------
+E1223 14:07:57.496603 40347 MaskNet.cc:109] No image data
+I1223 14:07:57.496726 40347 Semantic.cc:203] ========语义分割结束=========
+----------Size of semantic optimization queue: 1
+=========Size of semantic queue: 1
+I1223 14:07:57.496978 40348 Semantic.cc:105] ------Optimize KF currentKF->mnId: 6
+I1223 14:07:57.497134 40348 Semantic.cc:108] ======keyframe Pose Optimization
+I1223 14:07:57.571820 40298 Tracking.cc:287] =======Start Track!
+I1223 14:07:57.636435 40298 ORBmatcher.cc:1603] ******Num of SizeGoodMapPoints matched: 121
+I1223 14:07:57.636610 40298 ORBmatcher.cc:1614] ******Total Num of SizeGoodMapPoints matched: 121
+I1223 14:07:57.854099 40298 ORBmatcher.cc:185] ------Num of GoodMapPoints matched: 232
+I1223 14:07:57.854292 40298 ORBmatcher.cc:198] ------Total Num of matched: 232
+I1223 14:07:58.174953 40298 Tracking.cc:287] =======Start Track!
+I1223 14:07:58.180635 40298 ORBmatcher.cc:1603] ******Num of SizeGoodMapPoints matched: 164
+I1223 14:07:58.180713 40298 ORBmatcher.cc:1614] ******Total Num of SizeGoodMapPoints matched: 164
+I1223 14:07:58.383921 40298 ORBmatcher.cc:185] ------Num of GoodMapPoints matched: 193
+I1223 14:07:58.384141 40298 ORBmatcher.cc:198] ------Total Num of matched: 193
+I1223 14:07:58.705427 40298 Tracking.cc:287] =======Start Track!
+I1223 14:07:58.711051 40298 ORBmatcher.cc:1603] ******Num of SizeGoodMapPoints matched: 162
+I1223 14:07:58.711198 40298 ORBmatcher.cc:1614] ******Total Num of SizeGoodMapPoints matched: 162
+I1223 14:07:58.942526 40298 ORBmatcher.cc:185] ------Num of GoodMapPoints matched: 197
+I1223 14:07:58.942761 40298 ORBmatcher.cc:198] ------Total Num of matched: 197
+I1223 14:07:59.283140 40298 Tracking.cc:287] =======Start Track!
+I1223 14:07:59.289604 40298 ORBmatcher.cc:1603] ******Num of SizeGoodMapPoints matched: 168
+I1223 14:07:59.289767 40298 ORBmatcher.cc:1614] ******Total Num of SizeGoodMapPoints matched: 168
+I1223 14:07:59.533476 40298 ORBmatcher.cc:185] ------Num of GoodMapPoints matched: 171
+I1223 14:07:59.533716 40298 ORBmatcher.cc:198] ------Total Num of matched: 171
+I1223 14:07:59.888329 40298 Tracking.cc:287] =======Start Track!
+I1223 14:07:59.894451 40298 ORBmatcher.cc:1603] ******Num of SizeGoodMapPoints matched: 162
+I1223 14:07:59.894605 40298 ORBmatcher.cc:1614] ******Total Num of SizeGoodMapPoints matched: 162
+I1223 14:08:00.126688 40298 ORBmatcher.cc:185] ------Num of GoodMapPoints matched: 189
+I1223 14:08:00.126940 40298 ORBmatcher.cc:198] ------Total Num of matched: 189
+I1223 14:08:00.433956 40298 Tracking.cc:287] =======Start Track!
+I1223 14:08:00.439246 40298 ORBmatcher.cc:1603] ******Num of SizeGoodMapPoints matched: 156
+I1223 14:08:00.439396 40298 ORBmatcher.cc:1614] ******Total Num of SizeGoodMapPoints matched: 156
+I1223 14:08:00.645771 40298 ORBmatcher.cc:185] ------Num of GoodMapPoints matched: 150
+I1223 14:08:00.646000 40298 ORBmatcher.cc:198] ------Total Num of matched: 150
+I1223 14:08:00.900864 40298 Tracking.cc:287] =======Start Track!
+I1223 14:08:00.904513 40298 ORBmatcher.cc:1603] ******Num of SizeGoodMapPoints matched: 102
+I1223 14:08:00.904747 40298 ORBmatcher.cc:1614] ******Total Num of SizeGoodMapPoints matched: 102
+I1223 14:08:01.093098 40298 ORBmatcher.cc:185] ------Num of GoodMapPoints matched: 195
+I1223 14:08:01.093232 40298 ORBmatcher.cc:198] ------Total Num of matched: 195
+I1223 14:08:01.368072 40298 Tracking.cc:287] =======Start Track!
+I1223 14:08:01.372480 40298 ORBmatcher.cc:1603] ******Num of SizeGoodMapPoints matched: 132
+I1223 14:08:01.372648 40298 ORBmatcher.cc:1614] ******Total Num of SizeGoodMapPoints matched: 132
+I1223 14:08:01.617439 40298 ORBmatcher.cc:185] ------Num of GoodMapPoints matched: 176
+I1223 14:08:01.617713 40298 ORBmatcher.cc:198] ------Total Num of matched: 176
+I1223 14:08:01.877370 40298 Tracking.cc:287] =======Start Track!
+I1223 14:08:01.881965 40298 ORBmatcher.cc:1603] ******Num of SizeGoodMapPoints matched: 138
+I1223 14:08:01.882125 40298 ORBmatcher.cc:1614] ******Total Num of SizeGoodMapPoints matched: 138
+I1223 14:08:02.097982 40298 ORBmatcher.cc:185] ------Num of GoodMapPoints matched: 165
+I1223 14:08:02.098155 40298 ORBmatcher.cc:198] ------Total Num of matched: 165
+I1223 14:08:02.386443 40298 Tracking.cc:287] =======Start Track!
+I1223 14:08:02.391028 40298 ORBmatcher.cc:1603] ******Num of SizeGoodMapPoints matched: 126
+I1223 14:08:02.391175 40298 ORBmatcher.cc:1614] ******Total Num of SizeGoodMapPoints matched: 126
+I1223 14:08:02.574821 40298 ORBmatcher.cc:185] ------Num of GoodMapPoints matched: 164
+I1223 14:08:02.574920 40298 ORBmatcher.cc:198] ------Total Num of matched: 164
+I1223 14:08:02.860505 40298 Tracking.cc:287] =======Start Track!
+I1223 14:08:02.865331 40298 ORBmatcher.cc:1603] ******Num of SizeGoodMapPoints matched: 133
+I1223 14:08:02.865481 40298 ORBmatcher.cc:1614] ******Total Num of SizeGoodMapPoints matched: 133
+I1223 14:08:03.079399 40298 ORBmatcher.cc:185] ------Num of GoodMapPoints matched: 152
+I1223 14:08:03.079619 40298 ORBmatcher.cc:198] ------Total Num of matched: 152
+I1223 14:08:03.403714 40298 Tracking.cc:287] =======Start Track!
+I1223 14:08:03.409359 40298 ORBmatcher.cc:1603] ******Num of SizeGoodMapPoints matched: 137
+I1223 14:08:03.409488 40298 ORBmatcher.cc:1614] ******Total Num of SizeGoodMapPoints matched: 137
+I1223 14:08:03.638363 40298 ORBmatcher.cc:185] ------Num of GoodMapPoints matched: 165
+I1223 14:08:03.638535 40298 ORBmatcher.cc:198] ------Total Num of matched: 165
+I1223 14:08:03.851310 40347 Semantic.cc:168] ==============================
+I1223 14:08:03.851562 40347 Semantic.cc:201] ========调用关键的语义分割函数=========
+I1223 14:08:03.851728 40347 MaskNet.cc:106] ---------------------
+E1223 14:08:03.851825 40347 MaskNet.cc:109] No image data
+----------Size of semantic optimization queue: 1
+I1223 14:08:03.851971 40347 Semantic.cc:203] ========语义分割结束=========
+=========Size of semantic queue: 1
+I1223 14:08:03.852197 40348 Semantic.cc:105] ------Optimize KF currentKF->mnId: 7
+I1223 14:08:03.852411 40348 Semantic.cc:108] ======keyframe Pose Optimization
+I1223 14:08:03.994872 40298 Tracking.cc:287] =======Start Track!
+I1223 14:08:04.028304 40298 ORBmatcher.cc:1603] ******Num of SizeGoodMapPoints matched: 159
+I1223 14:08:04.028452 40298 ORBmatcher.cc:1614] ******Total Num of SizeGoodMapPoints matched: 159
+I1223 14:08:04.252478 40298 ORBmatcher.cc:185] ------Num of GoodMapPoints matched: 111
+I1223 14:08:04.252697 40298 ORBmatcher.cc:198] ------Total Num of matched: 111
+I1223 14:08:04.553879 40298 Tracking.cc:287] =======Start Track!
+I1223 14:08:04.558794 40298 ORBmatcher.cc:1603] ******Num of SizeGoodMapPoints matched: 143
+I1223 14:08:04.558944 40298 ORBmatcher.cc:1614] ******Total Num of SizeGoodMapPoints matched: 143
+I1223 14:08:04.762109 40298 ORBmatcher.cc:185] ------Num of GoodMapPoints matched: 119
+I1223 14:08:04.762317 40298 ORBmatcher.cc:198] ------Total Num of matched: 119
+I1223 14:08:05.026823 40298 Tracking.cc:287] =======Start Track!
+I1223 14:08:05.031664 40298 ORBmatcher.cc:1603] ******Num of SizeGoodMapPoints matched: 139
+I1223 14:08:05.031772 40298 ORBmatcher.cc:1614] ******Total Num of SizeGoodMapPoints matched: 139
+I1223 14:08:05.246412 40298 ORBmatcher.cc:185] ------Num of GoodMapPoints matched: 118
+I1223 14:08:05.246680 40298 ORBmatcher.cc:198] ------Total Num of matched: 118
+I1223 14:08:05.558360 40298 Tracking.cc:287] =======Start Track!
+I1223 14:08:05.562717 40298 ORBmatcher.cc:1603] ******Num of SizeGoodMapPoints matched: 129
+I1223 14:08:05.562860 40298 ORBmatcher.cc:1614] ******Total Num of SizeGoodMapPoints matched: 129
+I1223 14:08:05.736027 40298 ORBmatcher.cc:185] ------Num of GoodMapPoints matched: 122
+I1223 14:08:05.736232 40298 ORBmatcher.cc:198] ------Total Num of matched: 122
+I1223 14:08:05.989292 40298 Tracking.cc:287] =======Start Track!
+I1223 14:08:05.993340 40298 ORBmatcher.cc:1603] ******Num of SizeGoodMapPoints matched: 113
+I1223 14:08:05.993480 40298 ORBmatcher.cc:1614] ******Total Num of SizeGoodMapPoints matched: 113
+I1223 14:08:06.201392 40298 ORBmatcher.cc:185] ------Num of GoodMapPoints matched: 125
+I1223 14:08:06.201607 40298 ORBmatcher.cc:198] ------Total Num of matched: 125
+I1223 14:08:06.499387 40298 Tracking.cc:287] =======Start Track!
+I1223 14:08:06.504016 40298 ORBmatcher.cc:1603] ******Num of SizeGoodMapPoints matched: 120
+I1223 14:08:06.504170 40298 ORBmatcher.cc:1614] ******Total Num of SizeGoodMapPoints matched: 120
+I1223 14:08:06.689256 40298 ORBmatcher.cc:185] ------Num of GoodMapPoints matched: 129
+I1223 14:08:06.689435 40298 ORBmatcher.cc:198] ------Total Num of matched: 129
+I1223 14:08:07.046077 40298 Tracking.cc:287] =======Start Track!
+I1223 14:08:07.050462 40298 ORBmatcher.cc:1603] ******Num of SizeGoodMapPoints matched: 128
+I1223 14:08:07.050606 40298 ORBmatcher.cc:1614] ******Total Num of SizeGoodMapPoints matched: 128
+I1223 14:08:07.232291 40298 ORBmatcher.cc:185] ------Num of GoodMapPoints matched: 123
+I1223 14:08:07.232506 40298 ORBmatcher.cc:198] ------Total Num of matched: 123
+I1223 14:08:07.551750 40298 Tracking.cc:287] =======Start Track!
+I1223 14:08:07.556790 40298 ORBmatcher.cc:1603] ******Num of SizeGoodMapPoints matched: 126
+I1223 14:08:07.556953 40298 ORBmatcher.cc:1614] ******Total Num of SizeGoodMapPoints matched: 126
+I1223 14:08:07.765588 40298 ORBmatcher.cc:185] ------Num of GoodMapPoints matched: 124
+I1223 14:08:07.765822 40298 ORBmatcher.cc:198] ------Total Num of matched: 124
+I1223 14:08:08.076764 40298 Tracking.cc:287] =======Start Track!
+I1223 14:08:08.080682 40298 ORBmatcher.cc:1603] ******Num of SizeGoodMapPoints matched: 109
+I1223 14:08:08.080828 40298 ORBmatcher.cc:1614] ******Total Num of SizeGoodMapPoints matched: 109
+I1223 14:08:08.256302 40298 ORBmatcher.cc:185] ------Num of GoodMapPoints matched: 135
+I1223 14:08:08.256466 40298 ORBmatcher.cc:198] ------Total Num of matched: 135
+===============Tracking Finished============
+===============Final Stage============
+I1223 14:08:08.493935 40298 Semantic.cc:376] ------Semantic thread request stop
+Semantic thread stopping
+I1223 14:08:08.494316 40348 Semantic.cc:74] Semantic thread Stopping ....
+I1223 14:08:08.494426 40348 Semantic.cc:127] ========Semantic tracking thread finished=======
+I1223 14:08:08.494570 40347 Semantic.cc:160] Semantic thread Stopping ....
+I1223 14:08:08.794209 40298 Semantic.cc:394] ==========[Semantic] FinalStage==============
+------Total semantic KeyFrame Nums: 7
+Average time of moving probability updating: 3.08656 ms
+Average time of mask generation: 11.376 ms
+Average time of semantic optimization: 85.8687 ms
+-------
+
+------median tracking time: 0.535772
+------mean tracking time: 0.737085
+
+Saving camera trajectory to CameraTrajectory.txt ...
+
+trajectory saved!
+
+Saving keyframe trajectory to KeyFrameTrajectory.txt ...
+
+trajectory saved!

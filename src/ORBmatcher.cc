@@ -20,14 +20,14 @@
 
 #include "ORBmatcher.h"
 
-#include<limits.h>
+#include <limits.h>
 
-#include<opencv2/core/core.hpp>
-#include<opencv2/features2d/features2d.hpp>
+#include <opencv2/core/core.hpp>
+#include <opencv2/features2d/features2d.hpp>
 
 #include "Thirdparty/DBoW2/DBoW2/FeatureVector.h"
 
-#include<stdint-gcc.h>
+#include <stdint-gcc.h>
 #include "Semantic.h"
 
 using namespace std;
@@ -43,10 +43,12 @@ ORBmatcher::ORBmatcher(float nnratio, bool checkOri): mfNNratio(nnratio), mbChec
 {
 }
 
-int ORBmatcher::SearchByProjection(Frame &F, const vector<MapPoint*> &vpMapPoints, const float th)
+//跟踪局部地图
+//
+int ORBmatcher::SearchByProjection(Frame& F, const vector<MapPoint*>& vpMapPoints, const float th)
 {
     //========================================
-    std::map<int, MapPoint*> goodMatchedPoints;
+    std::map<int, MapPoint*> goodMatchedPoints;   // 去掉动态点的好点
     std::map<int, MapPoint*> initMatchedPoints;
    
    
@@ -54,12 +56,15 @@ int ORBmatcher::SearchByProjection(Frame &F, const vector<MapPoint*> &vpMapPoint
 
     const bool bFactor = th!=1.0;
 
-    // ================= [semantic] Test
+    // ================= [semantic] Test==========
     cv::Mat showFeature = F.mImRGB.clone();
 
-    for(size_t iMP=0; iMP<vpMapPoints.size(); iMP++)
+    for(size_t iMP=0; iMP<vpMapPoints.size(); iMP++)    //遍历所有MapPoints
     {
+        /*判断该点是否需要投影*/
         MapPoint* pMP = vpMapPoints[iMP];
+        // 在SearchLocalPoints()中已经将Local MapPoints重投影（isInFrustum()）到当前帧，
+        // 并标记了这些点是否在当前帧的视野中即mbTrackInView
         if(!pMP->mbTrackInView)
             continue;
 
@@ -70,22 +75,24 @@ int ORBmatcher::SearchByProjection(Frame &F, const vector<MapPoint*> &vpMapPoint
         // if (pMP->IsDynamicMapPoint())
         //     continue;
 
-
+        // 通过距离预测的金字塔层数，该层数相对于当前的帧
         const int &nPredictedLevel = pMP->mnTrackScaleLevel;
 
         // The size of the window will depend on the viewing direction
         float r = RadiusByViewingCos(pMP->mTrackViewCos);
 
+        // 如果需要进行更粗糙搜索，则增大范围
         if(bFactor)
             r*=th;
 
+        // 通过投影点(投影到当前帧，见isInFrustum())以及搜索窗口和预测的尺度进行搜索, 找出附近的兴趣点
         const vector<size_t> vIndices =
                 F.GetFeaturesInArea(pMP->mTrackProjX,pMP->mTrackProjY,r*F.mvScaleFactors[nPredictedLevel],nPredictedLevel-1,nPredictedLevel);
 
         if(vIndices.empty())
             continue;
 
-        const cv::Mat MPdescriptor = pMP->GetDescriptor();
+        const cv::Mat MPdescriptor = pMP->GetDescriptor();  //求描述子
 
         int bestDist=256;
         int bestLevel= -1;
@@ -98,6 +105,7 @@ int ORBmatcher::SearchByProjection(Frame &F, const vector<MapPoint*> &vpMapPoint
         {
             const size_t idx = *vit;
 
+            // 如果Frame中的该兴趣点已经有对应的MapPoint了,则退出该次循环
             if(F.mvpMapPoints[idx])
                 if(F.mvpMapPoints[idx]->Observations()>0)
                     continue;
@@ -111,8 +119,9 @@ int ORBmatcher::SearchByProjection(Frame &F, const vector<MapPoint*> &vpMapPoint
 
             const cv::Mat &d = F.mDescriptors.row(idx);
 
-            const int dist = DescriptorDistance(MPdescriptor,d);
+            const int dist = DescriptorDistance(MPdescriptor,d);    //求取描述子距离
 
+            // 根据描述子寻找描述子距离最小和次小的特征点
             if(dist<bestDist)
             {
                 bestDist2=bestDist;
@@ -121,7 +130,7 @@ int ORBmatcher::SearchByProjection(Frame &F, const vector<MapPoint*> &vpMapPoint
                 bestLevel = F.mvKeysUn[idx].octave;
                 bestIdx=idx;
             }
-            else if(dist<bestDist2)
+            else if(dist<bestDist2) //求次小距离
             {
                 bestLevel2 = F.mvKeysUn[idx].octave;
                 bestDist2=dist;
@@ -129,35 +138,39 @@ int ORBmatcher::SearchByProjection(Frame &F, const vector<MapPoint*> &vpMapPoint
         }
 
         // Apply ratio to second match (only if best and second are in the same scale level)
-        //============================================================================
-        if(bestDist<=TH_HIGH)
-        {
-            if(bestLevel==bestLevel2 && bestDist>mfNNratio*bestDist2)
-            {
-                // cv::Point uv(pMP->mTrackProjX, pMP->mTrackProjY);
-                cv::Point uv = F.mvKeys[bestIdx].pt;
-                F.mvbKptOutliers[bestIdx] = true;
-                cv::circle(showFeature, uv, 5, cv::Scalar(0, 0, 255), -1);
+        
+        if(bestDist<=TH_HIGH){
+            if(bestLevel==bestLevel2 && bestDist>mfNNratio*bestDist2)   //????
                 continue;
-            }
-            if (pMP->GetMovingProbability() == 0.5) 
-            {
-                initMatchedPoints.insert(std::pair<int, MapPoint*>(bestIdx, pMP));
-            }
-            if (pMP->GetMovingProbability() < 0.5)
-            {
-                F.mvbKptOutliers[bestIdx] = false;
-                // F.mvpMapPoints[bestIdx] = pMP;
-                goodMatchedPoints.insert(std::pair<int, MapPoint*>(bestIdx, pMP));
+
+            //=========================判断地图点的移动概率=========================
+            if(bestLevel != bestLevel2 || bestDist <= mfNNratio * bestDist2){
+                if (pMP->GetMovingProbability() > 0.5) {
+                    // cv::Point uv(pMP->mTrackProjX, pMP->mTrackProjY);
+                    cv::Point uv = F.mvKeys[bestIdx].pt;
+                    F.mvbKptOutliers[bestIdx] = true;   //是动态点，mvbKptOutliers值就为true
+                    cv::circle(showFeature, uv, 5, cv::Scalar(0, 0, 255), -1);  // 动态点是红色
+                    continue;
+                }
+                if (pMP->GetMovingProbability() == 0.5) {
+                    initMatchedPoints.insert(std::pair<int, MapPoint*>(bestIdx, pMP));
+                }
+                if (pMP->GetMovingProbability() < 0.5) {
+                    F.mvbKptOutliers[bestIdx] = false;
+                    //F.mvpMapPoints[bestIdx] = pMP;
+                    goodMatchedPoints.insert(std::pair<int, MapPoint*>(bestIdx, pMP));
+                }
+
+                nmatches++;
             }
         
 
             //F.mvpMapPoints[bestIdx]=pMP;
-            nmatches++;
+            
         }
     }
 
-    //================================================================
+    //=====================去掉动态点后，保存静态点，画出图像============================
     int nSizeGoodMapPoints = goodMatchedPoints.size();
     int nSizeInitMapPoints = initMatchedPoints.size();
 
@@ -169,20 +182,20 @@ int ORBmatcher::SearchByProjection(Frame &F, const vector<MapPoint*> &vpMapPoint
         cv::circle(showFeature, uv, 5, cv::Scalar(255, 0, 0), -1);
     }
     nmatches = nSizeGoodMapPoints;
-    LOG(INFO) << "Num of matched: " << nmatches;
+    LOG(INFO) << "------Num of GoodMapPoints matched: " << nmatches;
 
-    if (nSizeGoodMapPoints < 30) {
+    if (nSizeGoodMapPoints < 30) {  //如果去掉动态点之后，SizeGoodMapPoints小于阈值，就只跟新initMatchedPoints
         for (auto it = initMatchedPoints.begin(); it != initMatchedPoints.end(); it++) {
             MapPoint* pMP = it->second;
             F.mvpMapPoints[it->first] = pMP;
             // cv::Point uv(pMP->mTrackProjX, pMP->mTrackProjY);
             cv::Point uv = F.mvKeys[it->first].pt;
-            cv::circle(showFeature, uv, 5, cv::Scalar(0, 255, 0), -1);
+            cv::circle(showFeature, uv, 5, cv::Scalar(0, 255, 0), -1);  //cv::Scalar颜色是BGR和透明度
         }
 
-        nmatches = nSizeGoodMapPoints + nSizeInitMapPoints;
+        nmatches = nSizeGoodMapPoints + nSizeInitMapPoints; //????
     }
-    LOG(INFO) << "Total Num of matched: " << nmatches;
+    LOG(INFO) << "------Total Num of matched: " << nmatches;
 
     // TODO save matched features
     Config::GetInstance()->saveImage(showFeature, "debug", "map_" + std::to_string(F.mnId) + ".png");
@@ -1398,6 +1411,8 @@ int ORBmatcher::SearchBySim3(KeyFrame *pKF1, KeyFrame *pKF2, vector<MapPoint*> &
     return nFound;
 }
 
+//通过投影匹配，当前帧和上一帧
+//上一帧中包含了MapPoints，对这些MapPoints进行tracking，由此增加当前帧的MapPoints
 int ORBmatcher::SearchByProjection(Frame &CurrentFrame, Frame &LastFrame, const float th, const bool bMono)
 {
     //===================
@@ -1434,14 +1449,13 @@ int ORBmatcher::SearchByProjection(Frame &CurrentFrame, Frame &LastFrame, const 
         MapPoint* pMP = LastFrame.mvpMapPoints[i];
         if(pMP)
         {
-            cout <<  LastFrame.mvbKptOutliers.size() << endl;
-            cout << "lyi: " << i << endl;
-            cout << "ly1: " << LastFrame.mvbOutlier[i]<< endl;
-            cout << "ly2: " << LastFrame.mvbKptOutliers[i] << endl;
-            
+            // LOG(INFO) << "------mvbKptOutliers.size: " << LastFrame.mvbKptOutliers.size() << endl;
+            // LOG(INFO) << "------i: " << i << endl;
+            // LOG(INFO) << "------LastFrame.mvbOutlier[i]: " << LastFrame.mvbOutlier[i]<< endl;
+            // LOG(INFO) << "------LastFrame.mvbKptOutliers[i]: " << LastFrame.mvbKptOutliers[i] << endl;
+            // ==========上一帧这个点不是外点，且不是关键点的外点
             if(!LastFrame.mvbOutlier[i] && !LastFrame.mvbKptOutliers[i])//======
             {
-                
                 // Project
                 cv::Mat x3Dw = pMP->GetWorldPos();
                 cv::Mat x3Dc = Rcw*x3Dw+tcw;
@@ -1521,7 +1535,7 @@ int ORBmatcher::SearchByProjection(Frame &CurrentFrame, Frame &LastFrame, const 
                         // cv::Point uv2(pMP->mTrackProjX, pMP->mTrackProjY);
 
                         CurrentFrame.mvbOutlier[bestIdx2] = true;
-                        cv::circle(showFeature, uv2, 5, cv::Scalar(0, 0, 255), -1);
+                        cv::circle(showFeature, uv2, 5, cv::Scalar(0, 0, 255), -1); //动态点画红色
                         continue;
                     }
 
@@ -1561,7 +1575,7 @@ int ORBmatcher::SearchByProjection(Frame &CurrentFrame, Frame &LastFrame, const 
         int ind2=-1;
         int ind3=-1;
 
-        ComputeThreeMaxima(rotHist,HISTO_LENGTH,ind1,ind2,ind3);
+        ComputeThreeMaxima(rotHist, HISTO_LENGTH, ind1, ind2, ind3);
 
         for(int i=0; i<HISTO_LENGTH; i++)
         {
@@ -1575,7 +1589,7 @@ int ORBmatcher::SearchByProjection(Frame &CurrentFrame, Frame &LastFrame, const 
             }
         }
     }
-    //========================================================================
+    //=======================去掉动态点，保存静态点，保存匹配图像====================================
     int nSizeGoodMapPoints = goodMatchedPoints.size();
     int nSizeInitMapPoints = initMatchedPoints.size();
 
@@ -1586,19 +1600,18 @@ int ORBmatcher::SearchByProjection(Frame &CurrentFrame, Frame &LastFrame, const 
         cv::circle(showFeature, uv2, 5, cv::Scalar(255, 0, 0), -1);
     }
     nmatches = nSizeGoodMapPoints;
-    LOG(INFO) << "Num of matched: " << nmatches;
+    LOG(INFO) << "******Num of SizeGoodMapPoints matched: " << nmatches;
 
-    if (nSizeGoodMapPoints < 30) {
+    if (nSizeGoodMapPoints < 30) {  //只画初始匹配点
         for (auto it = initMatchedPoints.begin(); it != initMatchedPoints.end(); it++) {
             MapPoint* pMP = it->second;
             CurrentFrame.mvpMapPoints[it->first] = pMP;
             cv::Point uv2 = CurrentFrame.mvKeys[it->first].pt;
-            cv::circle(showFeature, uv2, 5, cv::Scalar(0, 255, 0), -1);
+            cv::circle(showFeature, uv2, 5, cv::Scalar(0, 255, 0), -1); // 绿色
         }
-
         nmatches = nSizeGoodMapPoints + nSizeInitMapPoints;
     }
-    LOG(INFO) << "Total Num of matched: " << nmatches;
+    LOG(INFO) << "******Total Num of SizeGoodMapPoints matched: " << nmatches;
 
     // TODO save matched features
     Config::GetInstance()->saveImage(showFeature, "debug", "motion_" + std::to_string(CurrentFrame.mnId) + ".png");
@@ -1613,6 +1626,8 @@ int ORBmatcher::SearchByProjection(Frame &CurrentFrame, Frame &LastFrame, const 
     return nmatches;
 }
 
+
+//通过投影匹配，当前帧，键帧
 int ORBmatcher::SearchByProjection(Frame &CurrentFrame, KeyFrame *pKF, const set<MapPoint*> &sAlreadyFound, const float th , const int ORBdist)
 {
     int nmatches = 0;
@@ -1638,7 +1653,7 @@ int ORBmatcher::SearchByProjection(Frame &CurrentFrame, KeyFrame *pKF, const set
 
         if(pMP)
         {
-            //===============================[semanic] skip dynamic map points
+            //================[semanic] skip dynamic map points
             if (pMP->IsDynamicMapPoint()) {
                 continue;
             }

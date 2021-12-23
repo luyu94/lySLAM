@@ -1,0 +1,167 @@
+\hypertarget{classlySLAM_1_1NumpyAllocator}{}\section{ly\+S\+L\+AM\+:\+:Numpy\+Allocator Class Reference}
+\label{classlySLAM_1_1NumpyAllocator}\index{ly\+S\+L\+A\+M\+::\+Numpy\+Allocator@{ly\+S\+L\+A\+M\+::\+Numpy\+Allocator}}
+
+
+Inheritance diagram for ly\+S\+L\+AM\+:\+:Numpy\+Allocator\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=214pt]{classlySLAM_1_1NumpyAllocator__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for ly\+S\+L\+AM\+:\+:Numpy\+Allocator\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=214pt]{classlySLAM_1_1NumpyAllocator__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classlySLAM_1_1NumpyAllocator_af955f14c0c1758b47841ba26f01d2799}{Numpy\+Allocator} ()
+\item 
+\hyperlink{classlySLAM_1_1NumpyAllocator_a444dd279208d905a277bbd7027dc274b}{$\sim$\+Numpy\+Allocator} ()
+\item 
+void \hyperlink{classlySLAM_1_1NumpyAllocator_a871b654d21f5bebe682fefeeaa24d02f}{allocate} (int dims, const int $\ast$sizes, int type, int $\ast$\&refcount, uchar $\ast$\&datastart, uchar $\ast$\&data, size\+\_\+t $\ast$step)
+\item 
+void \hyperlink{classlySLAM_1_1NumpyAllocator_a7568a09a23ce22ace5425f5bdd327c75}{deallocate} (int $\ast$refcount, uchar $\ast$, uchar $\ast$)
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+
+
+Definition at line 74 of file Conversion.\+cc.
+
+
+
+\subsection{Constructor \& Destructor Documentation}
+\index{ly\+S\+L\+A\+M\+::\+Numpy\+Allocator@{ly\+S\+L\+A\+M\+::\+Numpy\+Allocator}!Numpy\+Allocator@{Numpy\+Allocator}}
+\index{Numpy\+Allocator@{Numpy\+Allocator}!ly\+S\+L\+A\+M\+::\+Numpy\+Allocator@{ly\+S\+L\+A\+M\+::\+Numpy\+Allocator}}
+\subsubsection[{\texorpdfstring{Numpy\+Allocator()}{NumpyAllocator()}}]{\setlength{\rightskip}{0pt plus 5cm}ly\+S\+L\+A\+M\+::\+Numpy\+Allocator\+::\+Numpy\+Allocator (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classlySLAM_1_1NumpyAllocator_af955f14c0c1758b47841ba26f01d2799}{}\label{classlySLAM_1_1NumpyAllocator_af955f14c0c1758b47841ba26f01d2799}
+
+
+Definition at line 77 of file Conversion.\+cc.
+
+
+\begin{DoxyCode}
+77 \{\}
+\end{DoxyCode}
+\index{ly\+S\+L\+A\+M\+::\+Numpy\+Allocator@{ly\+S\+L\+A\+M\+::\+Numpy\+Allocator}!````~Numpy\+Allocator@{$\sim$\+Numpy\+Allocator}}
+\index{````~Numpy\+Allocator@{$\sim$\+Numpy\+Allocator}!ly\+S\+L\+A\+M\+::\+Numpy\+Allocator@{ly\+S\+L\+A\+M\+::\+Numpy\+Allocator}}
+\subsubsection[{\texorpdfstring{$\sim$\+Numpy\+Allocator()}{~NumpyAllocator()}}]{\setlength{\rightskip}{0pt plus 5cm}ly\+S\+L\+A\+M\+::\+Numpy\+Allocator\+::$\sim$\+Numpy\+Allocator (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classlySLAM_1_1NumpyAllocator_a444dd279208d905a277bbd7027dc274b}{}\label{classlySLAM_1_1NumpyAllocator_a444dd279208d905a277bbd7027dc274b}
+
+
+Definition at line 78 of file Conversion.\+cc.
+
+
+\begin{DoxyCode}
+78 \{\}
+\end{DoxyCode}
+
+
+\subsection{Member Function Documentation}
+\index{ly\+S\+L\+A\+M\+::\+Numpy\+Allocator@{ly\+S\+L\+A\+M\+::\+Numpy\+Allocator}!allocate@{allocate}}
+\index{allocate@{allocate}!ly\+S\+L\+A\+M\+::\+Numpy\+Allocator@{ly\+S\+L\+A\+M\+::\+Numpy\+Allocator}}
+\subsubsection[{\texorpdfstring{allocate(int dims, const int $\ast$sizes, int type, int $\ast$\&refcount, uchar $\ast$\&datastart, uchar $\ast$\&data, size\+\_\+t $\ast$step)}{allocate(int dims, const int *sizes, int type, int *&refcount, uchar *&datastart, uchar *&data, size_t *step)}}]{\setlength{\rightskip}{0pt plus 5cm}void ly\+S\+L\+A\+M\+::\+Numpy\+Allocator\+::allocate (
+\begin{DoxyParamCaption}
+\item[{int}]{dims, }
+\item[{const int $\ast$}]{sizes, }
+\item[{int}]{type, }
+\item[{int $\ast$\&}]{refcount, }
+\item[{uchar $\ast$\&}]{datastart, }
+\item[{uchar $\ast$\&}]{data, }
+\item[{size\+\_\+t $\ast$}]{step}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classlySLAM_1_1NumpyAllocator_a871b654d21f5bebe682fefeeaa24d02f}{}\label{classlySLAM_1_1NumpyAllocator_a871b654d21f5bebe682fefeeaa24d02f}
+
+
+Definition at line 80 of file Conversion.\+cc.
+
+
+\begin{DoxyCode}
+82     \{
+83 
+84         \textcolor{comment}{//PyEnsureGIL gil;}
+85 
+86         \textcolor{keywordtype}{int} depth = CV\_MAT\_DEPTH(type);
+87         \textcolor{keywordtype}{int} cn = CV\_MAT\_CN(type);
+88 
+89         \textcolor{keyword}{const} \textcolor{keywordtype}{int} f = (int)(\textcolor{keyword}{sizeof}(\textcolor{keywordtype}{size\_t})/8);
+90         \textcolor{keywordtype}{int} typenum = depth == CV\_8U ? NPY\_UBYTE : depth == CV\_8S ? NPY\_BYTE :
+91                                                                     depth == CV\_16U ? NPY\_USHORT : depth ==
+       CV\_16S ? NPY\_SHORT :
+92                                                                                                            
+                depth == CV\_32S ? NPY\_INT : depth == CV\_32F ? NPY\_FLOAT :
+93                                                                                                            
+                                                              depth == CV\_64F ? NPY\_DOUBLE : f*NPY\_ULONGLONG + (f^
+      1)*NPY\_UINT;
+94         \textcolor{keywordtype}{int} i;
+95 
+96         npy\_intp \_sizes[CV\_MAX\_DIM+1];
+97         \textcolor{keywordflow}{for}( i = 0; i < dims; i++ )
+98         \{
+99             \_sizes[i] = sizes[i];
+100         \}
+101 
+102         \textcolor{keywordflow}{if}( cn > 1 )
+103         \{
+104             \_sizes[dims++] = cn;
+105         \}
+106         PyObject* o = PyArray\_SimpleNew(dims, \_sizes, typenum);
+107         \textcolor{keywordflow}{if}(!o)
+108         \{
+109 
+110             CV\_Error\_(CV\_StsError, (\textcolor{stringliteral}{"The numpy array of typenum=%d, ndims=%d can not be created"}, typenum, 
+      dims));
+111         \}
+112         refcount = refcountFromPyObject(o);
+113 
+114         npy\_intp* \_strides = PyArray\_STRIDES(o);
+115         \textcolor{keywordflow}{for}( i = 0; i < dims - (cn > 1); i++ )
+116             step[i] = (\textcolor{keywordtype}{size\_t})\_strides[i];
+117 
+118         datastart = data = (uchar*) PyArray\_DATA(o);
+119 
+120     \}
+\end{DoxyCode}
+\index{ly\+S\+L\+A\+M\+::\+Numpy\+Allocator@{ly\+S\+L\+A\+M\+::\+Numpy\+Allocator}!deallocate@{deallocate}}
+\index{deallocate@{deallocate}!ly\+S\+L\+A\+M\+::\+Numpy\+Allocator@{ly\+S\+L\+A\+M\+::\+Numpy\+Allocator}}
+\subsubsection[{\texorpdfstring{deallocate(int $\ast$refcount, uchar $\ast$, uchar $\ast$)}{deallocate(int *refcount, uchar *, uchar *)}}]{\setlength{\rightskip}{0pt plus 5cm}void ly\+S\+L\+A\+M\+::\+Numpy\+Allocator\+::deallocate (
+\begin{DoxyParamCaption}
+\item[{int $\ast$}]{refcount, }
+\item[{uchar $\ast$}]{, }
+\item[{uchar $\ast$}]{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classlySLAM_1_1NumpyAllocator_a7568a09a23ce22ace5425f5bdd327c75}{}\label{classlySLAM_1_1NumpyAllocator_a7568a09a23ce22ace5425f5bdd327c75}
+
+
+Definition at line 122 of file Conversion.\+cc.
+
+
+\begin{DoxyCode}
+123     \{
+124         \textcolor{comment}{//PyEnsureGIL gil;}
+125         \textcolor{keywordflow}{if}( !refcount )
+126             \textcolor{keywordflow}{return};
+127         PyObject* o = pyObjectFromRefcount(refcount);
+128         Py\_INCREF(o);
+129         Py\_DECREF(o);
+130     \}
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{Conversion_8cc}{Conversion.\+cc}\end{DoxyCompactItemize}

@@ -1,0 +1,69 @@
+\hypertarget{MaskNet_8cc}{}\section{Mask\+Net.\+cc File Reference}
+\label{MaskNet_8cc}\index{Mask\+Net.\+cc@{Mask\+Net.\+cc}}
+{\ttfamily \#include \char`\"{}Common.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}Mask\+Net.\+h\char`\"{}}\\*
+{\ttfamily \#include $<$iostream$>$}\\*
+{\ttfamily \#include $<$fstream$>$}\\*
+{\ttfamily \#include $<$iomanip$>$}\\*
+{\ttfamily \#include $<$dirent.\+h$>$}\\*
+{\ttfamily \#include $<$errno.\+h$>$}\\*
+Include dependency graph for Mask\+Net.\+cc\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{MaskNet_8cc__incl}
+\end{center}
+\end{figure}
+\subsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+ \hyperlink{namespacelySLAM}{ly\+S\+L\+AM}
+\end{DoxyCompactItemize}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{MaskNet_8cc_a8e5d338049896ac5a96c5b617e3e543a}{U\+\_\+\+S\+E\+G\+St}(a)
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{namespacelySLAM_a83245374bbce9e47c4878b5613fb98db}{ly\+S\+L\+A\+M\+::tic\+\_\+initsv} ()
+\item 
+void \hyperlink{namespacelySLAM_adb77bc91beb203170ca5a301968f9f76}{ly\+S\+L\+A\+M\+::toc\+\_\+finalsv} (double \&time)
+\item 
+void \hyperlink{namespacelySLAM_af18d8f81de160c1de261c5465c29523e}{ly\+S\+L\+A\+M\+::ticsv} ()
+\item 
+void \hyperlink{namespacelySLAM_a56e5af1fe2c6086f5597b0e44465ffc3}{ly\+S\+L\+A\+M\+::tocsv} ()
+\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+struct timeval \hyperlink{namespacelySLAM_a823e029c6b9b89870dc987acb8e9c032}{ly\+S\+L\+A\+M\+::tvsv}
+\item 
+double \hyperlink{namespacelySLAM_ab1de636cddc68247bbed233099d643f9}{ly\+S\+L\+A\+M\+::t1sv}
+\item 
+double \hyperlink{namespacelySLAM_a6b5e057f8ce421fbc6d49a07ef7e3273}{ly\+S\+L\+A\+M\+::t2sv}
+\item 
+double \hyperlink{namespacelySLAM_aee2bcc68912513a06dfc54c894ae3efc}{ly\+S\+L\+A\+M\+::t0sv}
+\item 
+double \hyperlink{namespacelySLAM_a76440f183e00c79997868ddfe1dae982}{ly\+S\+L\+A\+M\+::t3sv}
+\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\index{Mask\+Net.\+cc@{Mask\+Net.\+cc}!U\+\_\+\+S\+E\+G\+St@{U\+\_\+\+S\+E\+G\+St}}
+\index{U\+\_\+\+S\+E\+G\+St@{U\+\_\+\+S\+E\+G\+St}!Mask\+Net.\+cc@{Mask\+Net.\+cc}}
+\subsubsection[{\texorpdfstring{U\+\_\+\+S\+E\+G\+St}{U_SEGSt}}]{\setlength{\rightskip}{0pt plus 5cm}\#define U\+\_\+\+S\+E\+G\+St(
+\begin{DoxyParamCaption}
+\item[{}]{a}
+\end{DoxyParamCaption}
+)}\hypertarget{MaskNet_8cc_a8e5d338049896ac5a96c5b617e3e543a}{}\label{MaskNet_8cc_a8e5d338049896ac5a96c5b617e3e543a}
+{\bfseries Value\+:}
+\begin{DoxyCode}
+gettimeofday(&\hyperlink{namespacelySLAM_a823e029c6b9b89870dc987acb8e9c032}{tvsv},0);\(\backslash\)
+    a = \hyperlink{namespacelySLAM_a823e029c6b9b89870dc987acb8e9c032}{tvsv}.tv\_sec + \hyperlink{namespacelySLAM_a823e029c6b9b89870dc987acb8e9c032}{tvsv}.tv\_usec/1000000.0
+\end{DoxyCode}
+
+
+Definition at line 21 of file Mask\+Net.\+cc.
+

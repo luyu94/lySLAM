@@ -1,0 +1,249 @@
+\hypertarget{namespacelySLAM}{}\section{ly\+S\+L\+AM Namespace Reference}
+\label{namespacelySLAM}\index{ly\+S\+L\+AM@{ly\+S\+L\+AM}}
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{classlySLAM_1_1NumpyAllocator}{Numpy\+Allocator}
+\item 
+class \hyperlink{classlySLAM_1_1PyAllowThreads}{Py\+Allow\+Threads}
+\item 
+class \hyperlink{classlySLAM_1_1PyEnsureGIL}{Py\+Ensure\+G\+IL}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+static void \hyperlink{namespacelySLAM_a00b314520d011d12b2bd631293ea02a8}{init} ()
+\item 
+static int \hyperlink{namespacelySLAM_a7b41c0e11cbb97ca1485abd44d51e799}{failmsg} (const char $\ast$fmt,...)
+\item 
+static Py\+Object $\ast$ \hyperlink{namespacelySLAM_a4c4e113b266fb98524f7c06154fe33e1}{failmsgp} (const char $\ast$fmt,...)
+\item 
+float \hyperlink{namespacelySLAM_a432cf91e1b1dee06c5d9a35cc1b5529a}{Area} (float x1, float x2, float y1, float y2)
+\item 
+void \hyperlink{namespacelySLAM_a83245374bbce9e47c4878b5613fb98db}{tic\+\_\+initsv} ()
+\item 
+void \hyperlink{namespacelySLAM_adb77bc91beb203170ca5a301968f9f76}{toc\+\_\+finalsv} (double \&time)
+\item 
+void \hyperlink{namespacelySLAM_af18d8f81de160c1de261c5465c29523e}{ticsv} ()
+\item 
+void \hyperlink{namespacelySLAM_a56e5af1fe2c6086f5597b0e44465ffc3}{tocsv} ()
+\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classlySLAM_1_1NumpyAllocator}{Numpy\+Allocator} \hyperlink{namespacelySLAM_a487059d3e4df5c492791c26d6316a9f2}{g\+\_\+numpy\+Allocator}
+\item 
+struct timeval \hyperlink{namespacelySLAM_a823e029c6b9b89870dc987acb8e9c032}{tvsv}
+\item 
+double \hyperlink{namespacelySLAM_ab1de636cddc68247bbed233099d643f9}{t1sv}
+\item 
+double \hyperlink{namespacelySLAM_a6b5e057f8ce421fbc6d49a07ef7e3273}{t2sv}
+\item 
+double \hyperlink{namespacelySLAM_aee2bcc68912513a06dfc54c894ae3efc}{t0sv}
+\item 
+double \hyperlink{namespacelySLAM_a76440f183e00c79997868ddfe1dae982}{t3sv}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+This file is part of Dyna\+S\+L\+AM. Copyright (C) 2018 Berta Bescos $<$bbescos at=\char`\"{}\char`\"{} unizar=\char`\"{}\char`\"{} dot=\char`\"{}\char`\"{} es$>$=\char`\"{}\char`\"{}$>$ (University of Zaragoza) For more information see \href{https://github.com/bertabescos/DynaSLAM}{\tt https\+://github.\+com/bertabescos/\+Dyna\+S\+L\+AM}. 
+
+\subsection{Function Documentation}
+\index{ly\+S\+L\+AM@{ly\+S\+L\+AM}!Area@{Area}}
+\index{Area@{Area}!ly\+S\+L\+AM@{ly\+S\+L\+AM}}
+\subsubsection[{\texorpdfstring{Area(float x1, float x2, float y1, float y2)}{Area(float x1, float x2, float y1, float y2)}}]{\setlength{\rightskip}{0pt plus 5cm}float ly\+S\+L\+A\+M\+::\+Area (
+\begin{DoxyParamCaption}
+\item[{float}]{x1, }
+\item[{float}]{x2, }
+\item[{float}]{y1, }
+\item[{float}]{y2}
+\end{DoxyParamCaption}
+)}\hypertarget{namespacelySLAM_a432cf91e1b1dee06c5d9a35cc1b5529a}{}\label{namespacelySLAM_a432cf91e1b1dee06c5d9a35cc1b5529a}
+
+
+Definition at line 468 of file Geometry.\+cc.
+
+
+\begin{DoxyCode}
+468                                                   \{
+469     \textcolor{keywordtype}{float} xc1 = max(x1-0.5,x2-0.5);
+470     \textcolor{keywordtype}{float} xc2 = min(x1+0.5,x2+0.5);
+471     \textcolor{keywordtype}{float} yc1 = max(y1-0.5,y2-0.5);
+472     \textcolor{keywordtype}{float} yc2 = min(y1+0.5,y2+0.5);
+473     \textcolor{keywordflow}{return} (xc2-xc1)*(yc2-yc1);
+474 \}
+\end{DoxyCode}
+\index{ly\+S\+L\+AM@{ly\+S\+L\+AM}!failmsg@{failmsg}}
+\index{failmsg@{failmsg}!ly\+S\+L\+AM@{ly\+S\+L\+AM}}
+\subsubsection[{\texorpdfstring{failmsg(const char $\ast$fmt,...)}{failmsg(const char *fmt,...)}}]{\setlength{\rightskip}{0pt plus 5cm}static int ly\+S\+L\+A\+M\+::failmsg (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{fmt, }
+\item[{}]{...}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{namespacelySLAM_a7b41c0e11cbb97ca1485abd44d51e799}{}\label{namespacelySLAM_a7b41c0e11cbb97ca1485abd44d51e799}
+
+
+Definition at line 21 of file Conversion.\+cc.
+
+
+\begin{DoxyCode}
+22 \{
+23     \textcolor{keywordtype}{char} str[1000];
+24 
+25     va\_list ap;
+26     va\_start(ap, fmt);
+27     vsnprintf(str, \textcolor{keyword}{sizeof}(str), fmt, ap);
+28     va\_end(ap);
+29 
+30     PyErr\_SetString(PyExc\_TypeError, str);
+31     \textcolor{keywordflow}{return} 0;
+32 \}
+\end{DoxyCode}
+\index{ly\+S\+L\+AM@{ly\+S\+L\+AM}!failmsgp@{failmsgp}}
+\index{failmsgp@{failmsgp}!ly\+S\+L\+AM@{ly\+S\+L\+AM}}
+\subsubsection[{\texorpdfstring{failmsgp(const char $\ast$fmt,...)}{failmsgp(const char *fmt,...)}}]{\setlength{\rightskip}{0pt plus 5cm}static Py\+Object$\ast$ ly\+S\+L\+A\+M\+::failmsgp (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{fmt, }
+\item[{}]{...}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{namespacelySLAM_a4c4e113b266fb98524f7c06154fe33e1}{}\label{namespacelySLAM_a4c4e113b266fb98524f7c06154fe33e1}
+
+
+Definition at line 61 of file Conversion.\+cc.
+
+
+\begin{DoxyCode}
+62 \{
+63     \textcolor{keywordtype}{char} str[1000];
+64 
+65     va\_list ap;
+66     va\_start(ap, fmt);
+67     vsnprintf(str, \textcolor{keyword}{sizeof}(str), fmt, ap);
+68     va\_end(ap);
+69 
+70     PyErr\_SetString(PyExc\_TypeError, str);
+71     \textcolor{keywordflow}{return} 0;
+72 \}
+\end{DoxyCode}
+\index{ly\+S\+L\+AM@{ly\+S\+L\+AM}!init@{init}}
+\index{init@{init}!ly\+S\+L\+AM@{ly\+S\+L\+AM}}
+\subsubsection[{\texorpdfstring{init()}{init()}}]{\setlength{\rightskip}{0pt plus 5cm}void ly\+S\+L\+A\+M\+::\+N\+D\+Array\+Converter\+::init (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\hypertarget{namespacelySLAM_a00b314520d011d12b2bd631293ea02a8}{}\label{namespacelySLAM_a00b314520d011d12b2bd631293ea02a8}
+
+
+Definition at line 16 of file Conversion.\+cc.
+
+
+\begin{DoxyCode}
+17 \{
+18     import\_array();
+19 \}
+\end{DoxyCode}
+\index{ly\+S\+L\+AM@{ly\+S\+L\+AM}!tic\+\_\+initsv@{tic\+\_\+initsv}}
+\index{tic\+\_\+initsv@{tic\+\_\+initsv}!ly\+S\+L\+AM@{ly\+S\+L\+AM}}
+\subsubsection[{\texorpdfstring{tic\+\_\+initsv()}{tic_initsv()}}]{\setlength{\rightskip}{0pt plus 5cm}void ly\+S\+L\+A\+M\+::tic\+\_\+initsv (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{namespacelySLAM_a83245374bbce9e47c4878b5613fb98db}{}\label{namespacelySLAM_a83245374bbce9e47c4878b5613fb98db}
+
+
+Definition at line 26 of file Mask\+Net.\+cc.
+
+
+\begin{DoxyCode}
+26 \{\hyperlink{MaskNet_8cc_a8e5d338049896ac5a96c5b617e3e543a}{U\_SEGSt}(\hyperlink{namespacelySLAM_aee2bcc68912513a06dfc54c894ae3efc}{t0sv});\}
+\end{DoxyCode}
+\index{ly\+S\+L\+AM@{ly\+S\+L\+AM}!ticsv@{ticsv}}
+\index{ticsv@{ticsv}!ly\+S\+L\+AM@{ly\+S\+L\+AM}}
+\subsubsection[{\texorpdfstring{ticsv()}{ticsv()}}]{\setlength{\rightskip}{0pt plus 5cm}void ly\+S\+L\+A\+M\+::ticsv (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{namespacelySLAM_af18d8f81de160c1de261c5465c29523e}{}\label{namespacelySLAM_af18d8f81de160c1de261c5465c29523e}
+
+
+Definition at line 28 of file Mask\+Net.\+cc.
+
+
+\begin{DoxyCode}
+28 \{\hyperlink{MaskNet_8cc_a8e5d338049896ac5a96c5b617e3e543a}{U\_SEGSt}(\hyperlink{namespacelySLAM_ab1de636cddc68247bbed233099d643f9}{t1sv});\}
+\end{DoxyCode}
+\index{ly\+S\+L\+AM@{ly\+S\+L\+AM}!toc\+\_\+finalsv@{toc\+\_\+finalsv}}
+\index{toc\+\_\+finalsv@{toc\+\_\+finalsv}!ly\+S\+L\+AM@{ly\+S\+L\+AM}}
+\subsubsection[{\texorpdfstring{toc\+\_\+finalsv(double \&time)}{toc_finalsv(double &time)}}]{\setlength{\rightskip}{0pt plus 5cm}void ly\+S\+L\+A\+M\+::toc\+\_\+finalsv (
+\begin{DoxyParamCaption}
+\item[{double \&}]{time}
+\end{DoxyParamCaption}
+)}\hypertarget{namespacelySLAM_adb77bc91beb203170ca5a301968f9f76}{}\label{namespacelySLAM_adb77bc91beb203170ca5a301968f9f76}
+
+
+Definition at line 27 of file Mask\+Net.\+cc.
+
+
+\begin{DoxyCode}
+27 \{\hyperlink{MaskNet_8cc_a8e5d338049896ac5a96c5b617e3e543a}{U\_SEGSt}(\hyperlink{namespacelySLAM_a76440f183e00c79997868ddfe1dae982}{t3sv}); time =  (\hyperlink{namespacelySLAM_a76440f183e00c79997868ddfe1dae982}{t3sv}- \hyperlink{namespacelySLAM_aee2bcc68912513a06dfc54c894ae3efc}{t0sv})/1;\}
+\end{DoxyCode}
+\index{ly\+S\+L\+AM@{ly\+S\+L\+AM}!tocsv@{tocsv}}
+\index{tocsv@{tocsv}!ly\+S\+L\+AM@{ly\+S\+L\+AM}}
+\subsubsection[{\texorpdfstring{tocsv()}{tocsv()}}]{\setlength{\rightskip}{0pt plus 5cm}void ly\+S\+L\+A\+M\+::tocsv (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{namespacelySLAM_a56e5af1fe2c6086f5597b0e44465ffc3}{}\label{namespacelySLAM_a56e5af1fe2c6086f5597b0e44465ffc3}
+
+
+Definition at line 29 of file Mask\+Net.\+cc.
+
+
+\begin{DoxyCode}
+29 \{\hyperlink{MaskNet_8cc_a8e5d338049896ac5a96c5b617e3e543a}{U\_SEGSt}(\hyperlink{namespacelySLAM_a6b5e057f8ce421fbc6d49a07ef7e3273}{t2sv});\}
+\end{DoxyCode}
+
+
+\subsection{Variable Documentation}
+\index{ly\+S\+L\+AM@{ly\+S\+L\+AM}!g\+\_\+numpy\+Allocator@{g\+\_\+numpy\+Allocator}}
+\index{g\+\_\+numpy\+Allocator@{g\+\_\+numpy\+Allocator}!ly\+S\+L\+AM@{ly\+S\+L\+AM}}
+\subsubsection[{\texorpdfstring{g\+\_\+numpy\+Allocator}{g_numpyAllocator}}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Numpy\+Allocator} ly\+S\+L\+A\+M\+::g\+\_\+numpy\+Allocator}\hypertarget{namespacelySLAM_a487059d3e4df5c492791c26d6316a9f2}{}\label{namespacelySLAM_a487059d3e4df5c492791c26d6316a9f2}
+
+
+Definition at line 205 of file Conversion.\+cc.
+
+\index{ly\+S\+L\+AM@{ly\+S\+L\+AM}!t0sv@{t0sv}}
+\index{t0sv@{t0sv}!ly\+S\+L\+AM@{ly\+S\+L\+AM}}
+\subsubsection[{\texorpdfstring{t0sv}{t0sv}}]{\setlength{\rightskip}{0pt plus 5cm}double ly\+S\+L\+A\+M\+::t0sv}\hypertarget{namespacelySLAM_aee2bcc68912513a06dfc54c894ae3efc}{}\label{namespacelySLAM_aee2bcc68912513a06dfc54c894ae3efc}
+
+
+Definition at line 25 of file Mask\+Net.\+cc.
+
+\index{ly\+S\+L\+AM@{ly\+S\+L\+AM}!t1sv@{t1sv}}
+\index{t1sv@{t1sv}!ly\+S\+L\+AM@{ly\+S\+L\+AM}}
+\subsubsection[{\texorpdfstring{t1sv}{t1sv}}]{\setlength{\rightskip}{0pt plus 5cm}double ly\+S\+L\+A\+M\+::t1sv}\hypertarget{namespacelySLAM_ab1de636cddc68247bbed233099d643f9}{}\label{namespacelySLAM_ab1de636cddc68247bbed233099d643f9}
+
+
+Definition at line 25 of file Mask\+Net.\+cc.
+
+\index{ly\+S\+L\+AM@{ly\+S\+L\+AM}!t2sv@{t2sv}}
+\index{t2sv@{t2sv}!ly\+S\+L\+AM@{ly\+S\+L\+AM}}
+\subsubsection[{\texorpdfstring{t2sv}{t2sv}}]{\setlength{\rightskip}{0pt plus 5cm}double ly\+S\+L\+A\+M\+::t2sv}\hypertarget{namespacelySLAM_a6b5e057f8ce421fbc6d49a07ef7e3273}{}\label{namespacelySLAM_a6b5e057f8ce421fbc6d49a07ef7e3273}
+
+
+Definition at line 25 of file Mask\+Net.\+cc.
+
+\index{ly\+S\+L\+AM@{ly\+S\+L\+AM}!t3sv@{t3sv}}
+\index{t3sv@{t3sv}!ly\+S\+L\+AM@{ly\+S\+L\+AM}}
+\subsubsection[{\texorpdfstring{t3sv}{t3sv}}]{\setlength{\rightskip}{0pt plus 5cm}double ly\+S\+L\+A\+M\+::t3sv}\hypertarget{namespacelySLAM_a76440f183e00c79997868ddfe1dae982}{}\label{namespacelySLAM_a76440f183e00c79997868ddfe1dae982}
+
+
+Definition at line 25 of file Mask\+Net.\+cc.
+
+\index{ly\+S\+L\+AM@{ly\+S\+L\+AM}!tvsv@{tvsv}}
+\index{tvsv@{tvsv}!ly\+S\+L\+AM@{ly\+S\+L\+AM}}
+\subsubsection[{\texorpdfstring{tvsv}{tvsv}}]{\setlength{\rightskip}{0pt plus 5cm}struct timeval ly\+S\+L\+A\+M\+::tvsv}\hypertarget{namespacelySLAM_a823e029c6b9b89870dc987acb8e9c032}{}\label{namespacelySLAM_a823e029c6b9b89870dc987acb8e9c032}
+
+
+Definition at line 24 of file Mask\+Net.\+cc.
+

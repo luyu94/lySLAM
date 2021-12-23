@@ -1,0 +1,80 @@
+\hypertarget{classlySLAM_1_1PyAllowThreads}{}\section{ly\+S\+L\+AM\+:\+:Py\+Allow\+Threads Class Reference}
+\label{classlySLAM_1_1PyAllowThreads}\index{ly\+S\+L\+A\+M\+::\+Py\+Allow\+Threads@{ly\+S\+L\+A\+M\+::\+Py\+Allow\+Threads}}
+
+
+Collaboration diagram for ly\+S\+L\+AM\+:\+:Py\+Allow\+Threads\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=211pt]{classlySLAM_1_1PyAllowThreads__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classlySLAM_1_1PyAllowThreads_ab8568add3eada88f40c00d1b5b30b0ad}{Py\+Allow\+Threads} ()
+\item 
+\hyperlink{classlySLAM_1_1PyAllowThreads_adcdfe6fcc17c17aa09079691e055bd9d}{$\sim$\+Py\+Allow\+Threads} ()
+\end{DoxyCompactItemize}
+\subsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+Py\+Thread\+State $\ast$ \hyperlink{classlySLAM_1_1PyAllowThreads_ac8076cd04c356e648d9ae5e28cd0d4aa}{\+\_\+state}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+
+
+Definition at line 34 of file Conversion.\+cc.
+
+
+
+\subsection{Constructor \& Destructor Documentation}
+\index{ly\+S\+L\+A\+M\+::\+Py\+Allow\+Threads@{ly\+S\+L\+A\+M\+::\+Py\+Allow\+Threads}!Py\+Allow\+Threads@{Py\+Allow\+Threads}}
+\index{Py\+Allow\+Threads@{Py\+Allow\+Threads}!ly\+S\+L\+A\+M\+::\+Py\+Allow\+Threads@{ly\+S\+L\+A\+M\+::\+Py\+Allow\+Threads}}
+\subsubsection[{\texorpdfstring{Py\+Allow\+Threads()}{PyAllowThreads()}}]{\setlength{\rightskip}{0pt plus 5cm}ly\+S\+L\+A\+M\+::\+Py\+Allow\+Threads\+::\+Py\+Allow\+Threads (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classlySLAM_1_1PyAllowThreads_ab8568add3eada88f40c00d1b5b30b0ad}{}\label{classlySLAM_1_1PyAllowThreads_ab8568add3eada88f40c00d1b5b30b0ad}
+
+
+Definition at line 37 of file Conversion.\+cc.
+
+
+\begin{DoxyCode}
+37 : \hyperlink{classlySLAM_1_1PyAllowThreads_ac8076cd04c356e648d9ae5e28cd0d4aa}{\_state}(PyEval\_SaveThread()) \{\}
+\end{DoxyCode}
+\index{ly\+S\+L\+A\+M\+::\+Py\+Allow\+Threads@{ly\+S\+L\+A\+M\+::\+Py\+Allow\+Threads}!````~Py\+Allow\+Threads@{$\sim$\+Py\+Allow\+Threads}}
+\index{````~Py\+Allow\+Threads@{$\sim$\+Py\+Allow\+Threads}!ly\+S\+L\+A\+M\+::\+Py\+Allow\+Threads@{ly\+S\+L\+A\+M\+::\+Py\+Allow\+Threads}}
+\subsubsection[{\texorpdfstring{$\sim$\+Py\+Allow\+Threads()}{~PyAllowThreads()}}]{\setlength{\rightskip}{0pt plus 5cm}ly\+S\+L\+A\+M\+::\+Py\+Allow\+Threads\+::$\sim$\+Py\+Allow\+Threads (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}\hypertarget{classlySLAM_1_1PyAllowThreads_adcdfe6fcc17c17aa09079691e055bd9d}{}\label{classlySLAM_1_1PyAllowThreads_adcdfe6fcc17c17aa09079691e055bd9d}
+
+
+Definition at line 38 of file Conversion.\+cc.
+
+
+\begin{DoxyCode}
+39     \{
+40         PyEval\_RestoreThread(\hyperlink{classlySLAM_1_1PyAllowThreads_ac8076cd04c356e648d9ae5e28cd0d4aa}{\_state});
+41     \}
+\end{DoxyCode}
+
+
+\subsection{Member Data Documentation}
+\index{ly\+S\+L\+A\+M\+::\+Py\+Allow\+Threads@{ly\+S\+L\+A\+M\+::\+Py\+Allow\+Threads}!\+\_\+state@{\+\_\+state}}
+\index{\+\_\+state@{\+\_\+state}!ly\+S\+L\+A\+M\+::\+Py\+Allow\+Threads@{ly\+S\+L\+A\+M\+::\+Py\+Allow\+Threads}}
+\subsubsection[{\texorpdfstring{\+\_\+state}{_state}}]{\setlength{\rightskip}{0pt plus 5cm}Py\+Thread\+State$\ast$ ly\+S\+L\+A\+M\+::\+Py\+Allow\+Threads\+::\+\_\+state\hspace{0.3cm}{\ttfamily [private]}}\hypertarget{classlySLAM_1_1PyAllowThreads_ac8076cd04c356e648d9ae5e28cd0d4aa}{}\label{classlySLAM_1_1PyAllowThreads_ac8076cd04c356e648d9ae5e28cd0d4aa}
+
+
+Definition at line 43 of file Conversion.\+cc.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{Conversion_8cc}{Conversion.\+cc}\end{DoxyCompactItemize}

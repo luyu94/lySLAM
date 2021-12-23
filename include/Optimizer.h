@@ -47,7 +47,7 @@ public:
     void static LocalBundleAdjustment(KeyFrame* pKF, bool *pbStopFlag, Map *pMap);
     int static PoseOptimization(Frame* pFrame);
 
-    //=======================
+    //========语义分割位姿优化====
     int static PoseOptimization(KeyFrame* pFrame, bool bUpdateMap);
     // void static SemanticBundleAdjustment(KeyFrame* pKF, bool* pbStopFlag);
     // void static SemanticBundleAdjustment(KeyFrame* pKF);

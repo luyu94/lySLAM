@@ -18,7 +18,8 @@
 #include "ndarrayobject.h"
 //#include "__multiarray_api.h"
 
-#define import_array() NUMPY_IMPORT_ARRAY_RETVAL
+//#define import_array() NUMPY_IMPORT_ARRAY_RETVAL
+#define NUMPY_IMPORT_ARRAY_RETVAL
 
 namespace lySLAM
 {
