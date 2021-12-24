@@ -145,21 +145,21 @@ int main(int argc, char *argv[])
         }
 
 
-        std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
+        std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();    //纳秒
 
-        double ttrack= std::chrono::duration_cast<std::chrono::duration<double> >(t2 - t1).count();
+        double ttrack= std::chrono::duration_cast<std::chrono::duration<double> >(t2 - t1).count();    //单位变成秒
 
         vTimesTrack[ni]=ttrack;
 
         // Wait to load the next frame
-        double T=0;
-        if(ni<nImages-1)
-            T = vTimestamps[ni+1]-tframe;
-        else if(ni>0)
-            T = tframe-vTimestamps[ni-1];
+        double T = 0;
+        if(ni < nImages - 1)
+            T = vTimestamps[ni + 1]-tframe;
+        else if(ni > 0)
+            T = tframe-vTimestamps[ni - 1];
 
-        if(ttrack<T)
-            usleep((T-ttrack)*1e6);
+        if(ttrack < T)
+            usleep((T - ttrack) * 1e6);
     }
 
     std::cout << "===============Tracking Finished============" << std::endl;
@@ -181,7 +181,9 @@ int main(int argc, char *argv[])
     }
     cout << "-------" << endl << endl;
     cout << "------median tracking time: " << vTimesTrack[nImages/2] << endl;
+    LOG(INFO) << "median tracking time: " << vTimesTrack[nImages / 2] * 1000 << "ms";
     cout << "------mean tracking time: " << totaltime/nImages << endl;
+    LOG(INFO) << "mean tracking time: " << totaltime / nImages * 1000 << "ms";
 
 
     // Save camera trajectory
